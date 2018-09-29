@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+    {% endblock %}
+
+    <link type="text/css" rel="stylesheet" href="/public/assets/css/app.css"/>
+</head>
+<body>
+
+{% include 'header.html' ignore missing %}
+
+{% block body %}
+
+{% endblock %}
+
+{% include 'footer.html' ignore missing %}
+
+<script src="/public/assets/js/app.js"></script>
+</body>
+</html>

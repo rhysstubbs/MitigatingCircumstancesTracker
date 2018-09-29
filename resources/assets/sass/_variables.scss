@@ -1,0 +1,103 @@
+// ------------------------------------------------------------------------------------------------------
+// FONT AWESOME
+
+$fa-font-path: "../fonts";
+
+// ------------------------------------------------------------------------------------------------------
+// SLICK CAROUSEL
+
+$slick-arrow-color: #000;
+
+// ------------------------------------------------------------------------------------------------------
+// FONTS
+
+$font-family-sans-serif: "Averta PE", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+
+$font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+$font-family-base: $font-family-sans-serif;
+
+$font-size-base: 1rem;
+$font-size-lg: ($font-size-base * 1.25);
+$font-size-sm: ($font-size-base * .875);
+
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-bold: 700;
+
+$font-weight-base: $font-weight-normal;
+$line-height-base: 1.5;
+
+$h1-font-size: $font-size-base * 2.5;
+$h2-font-size: $font-size-base * 2;
+$h3-font-size: $font-size-base * 1.75;
+$h4-font-size: $font-size-base * 1.5;
+$h5-font-size: $font-size-base * 1.25;
+$h6-font-size: $font-size-base;
+
+// ------------------------------------------------------------------------------------------------------
+// COLORS
+
+$dark-light: #212121;
+
+$gray-light: #dddddd;
+$gray-mid: #939393;
+$gray-dark: #3d3b3d;
+
+$gray-link: #4e4e4e;
+
+$blue: #007bff;
+$indigo: #6610f2;
+$purple: #6f42c1;
+$pink: #e83e8c;
+$red: #dc3545;
+$orange: #e26722;
+$yellow: #ffc107;
+$green: #28a745;
+$teal: #20c997;
+$cyan: #17a2b8;
+
+$primary: $orange;
+$secondary: $gray-600;
+$success: $green;
+$info: $cyan;
+$warning: $yellow;
+$danger: $red;
+$light: $gray-100;
+$dark: $gray-800;
+
+$twitter: #00aced;
+$telegram: #0088cc;
+$facebook: #3B5998;
+
+// ------------------------------------------------------------------------------------------------------
+// GRID
+
+$grid-breakpoints: (
+        xs: 0,
+        sm: 600px,
+        md: 960px,
+        lg: 1280px,
+        xl: 1920px
+);
+
+$container-max-widths: (
+        sm: 574px,
+        md: 920px,
+        lg: 1248px,
+        xl: 1860px
+);
+
+$grid-columns: 24;
+$grid-gutter-width: 24px;
+
+$xs: "(max-width: #{map-get($grid-breakpoints, 'sm') - 1})";
+$sm: "(min-width: #{map-get($grid-breakpoints, 'sm')}) and (max-width: #{map-get($grid-breakpoints, 'md') - 1})";
+$sm-down: "(max-width: #{map-get($grid-breakpoints, 'md') - 1})";
+$sm-up: "(min-width: #{map-get($grid-breakpoints, 'sm')})";
+$md: "(min-width: #{map-get($grid-breakpoints, 'md')}) and (max-width: #{map-get($grid-breakpoints, 'lg') - 1})";
+$md-down: "(max-width: #{map-get($grid-breakpoints, 'lg') - 1})";
+$md-up: "(min-width: #{map-get($grid-breakpoints, 'md')})";
+$lg: "(min-width: #{map-get($grid-breakpoints, 'lg')}) and (max-width: #{map-get($grid-breakpoints, 'xl') - 1})";
+$lg-down: "(max-width: #{map-get($grid-breakpoints, 'xl') - 1})";
+$lg-up: "(min-width: #{map-get($grid-breakpoints, 'lg')})";
+$xl: "(min-width: #{map-get($grid-breakpoints, 'xl')})";
