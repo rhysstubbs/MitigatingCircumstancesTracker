@@ -14585,4 +14585,46 @@ button.close {
   }
 }
 
+.btn:focus-within,
+.btn:focus,
+.btn:active {
+  box-shadow: none !important;
+}
+
+#navbar .navbar-brand img {
+  width: 200px;
+  max-width: 100%;
+  height: auto;
+}
+
+#form-signin {
+  height: 100vh;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+      align-items: center;
+  -ms-flex-pack: center;
+      justify-content: center;
+}
+
+#form-signin form {
+  max-width: 460px;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  padding: 48px 38px;
+  border: 1px solid #d91477;
+  margin: 0 auto;
+}
+
+#form-signin form img {
+  height: 100px;
+  width: auto;
+}
+
+#form-signin form button[type=submit] {
+  border: #d81476;
+  background-color: #d81476;
+}
+
 

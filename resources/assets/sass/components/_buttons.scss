@@ -1,0 +1,9 @@
+.btn {
+
+  &:focus-within,
+  &:focus,
+  &:active {
+    box-shadow: none !important;
+  }
+
+}

@@ -1,2 +1,6 @@
 @import "utilities/bootstrap";
-@import "pages/**/*"
+
+@import "components/buttons";
+@import "components/global";
+
+@import "pages/**/*";

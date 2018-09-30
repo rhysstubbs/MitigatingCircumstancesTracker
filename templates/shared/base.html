@@ -7,6 +7,8 @@
     {% endblock %}
 
     <link type="text/css" rel="stylesheet" href="/public/assets/css/app.css"/>
+
+    {% block headerScripts %} {% endblock %}
 </head>
 <body>
 
@@ -18,6 +20,8 @@
 
 {% include 'footer.html' ignore missing %}
 
-<script src="/public/assets/js/app.js"></script>
+<script src="/public/assets/js/vendor.js" type="application/javascript"></script>
+<script src="/public/assets/js/app.js" type="application/javascript"></script>
+{% block footerScripts %} {% endblock %}
 </body>
 </html>

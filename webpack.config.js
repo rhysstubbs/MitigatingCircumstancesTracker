@@ -245,7 +245,7 @@ module.exports = {
     resolve: {
         extensions: [ '*', '.js', '.jsx' ],
         alias: {
-            "chainium-ui": path.resolve('./resources/assets/js'),
+            "MCT": path.resolve('./resources/assets/js'),
             "matches-selector/matches-selector": "desandro-matches-selector",
             "eventEmitter/EventEmitter": "wolfy87-eventemitter",
             "get-style-property/get-style-property": "desandro-get-style-property"

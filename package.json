@@ -26,6 +26,12 @@
     "type": "git",
     "url": "git+https://github.com/rhysstubbs/MitigatingCircumstancesTracker.git"
   },
+  "dependencies": {
+    "@material-ui/core": "^1.2.0",
+    "@material-ui/icons": "^1.1.0",
+    "@material-ui/lab": "^1.0.0-alpha.5",
+    "reactstrap": "^6.4.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.49",
     "@babel/plugin-proposal-class-properties": "^7.0.0-beta.49",
@@ -60,6 +66,7 @@
     "react-dom": "^16.4.0",
     "react-redux": "^5.0.7",
     "react-router-dom": "^4.3.1",
+    "prop-types": "^15.6.2",
     "react-table": "^6.8.6",
     "redux": "^4.0.0",
     "resolve-url-loader": "^2.3.0",

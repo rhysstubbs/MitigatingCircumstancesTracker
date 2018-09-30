@@ -1,0 +1,17 @@
+{% extends "shared/base.html" %}
+
+{% block headerScripts %}
+    <script>
+        window.app = {
+            username: "{{ username }}"
+        }
+    </script>
+{% endblock %}
+
+{% block body %}
+
+    <div id="app">
+
+    </div>
+
+{% endblock %}

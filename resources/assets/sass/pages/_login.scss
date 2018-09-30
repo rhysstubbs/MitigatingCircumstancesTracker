@@ -1,5 +1,27 @@
-.form-signin {
+#form-signin {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
+  form {
+    max-width: 460px;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+    padding: 48px 38px;
+    border: 1px solid lighten($pink, .2);
+    margin: 0 auto;
 
+    img {
+      height: 100px;
+      width: auto;
+    }
+
+    button[type=submit] {
+      border: $pink;
+      background-color: $pink;
+    }
+  }
 
 }
