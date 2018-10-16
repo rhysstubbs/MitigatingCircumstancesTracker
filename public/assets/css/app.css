@@ -14591,10 +14591,60 @@ button.close {
   box-shadow: none !important;
 }
 
+.btn.red {
+  color: #dc3545 !important;
+  background-color: #fff !important;
+}
+
 #navbar .navbar-brand img {
   width: 200px;
   max-width: 100%;
   height: auto;
+}
+
+.ReactTable .rt-table .rt-th,
+.ReactTable .rt-table .rt-thead .rt-th,
+.ReactTable .rt-table .rt-td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: center;
+}
+
+.ReactTable .rt-table .rt-th.action {
+  -ms-flex: 1 1 auto !important;
+      flex: 1 1 auto !important;
+  width: -webkit-fit-content !important;
+  width: -moz-fit-content !important;
+  width: fit-content !important;
+  min-width: 94.5px;
+}
+
+.ReactTable .rt-table .rt-td {
+  -ms-flex-pack: center;
+      justify-content: center;
+}
+
+.ReactTable .rt-table .rt-td.action {
+  text-align: center;
+  -ms-flex-pack: center;
+      justify-content: center;
+  -ms-flex: 1 1 auto !important;
+      flex: 1 1 auto !important;
+  width: -webkit-fit-content !important;
+  width: -moz-fit-content !important;
+  width: fit-content !important;
+  min-width: 94.5px;
+}
+
+.ReactTable .rt-table .action {
+  text-align: right;
+  border-bottom: none;
+}
+
+.ReactTable .-sort-desc,
+.ReactTable .-sort-asc {
+  position: relative;
+  box-shadow: none !important;
 }
 
 #form-signin {

@@ -3,7 +3,9 @@
 {% block headerScripts %}
     <script>
         window.app = {
-            username: "{{ username }}"
+            data: {
+                user: {{ user_data|safe}}
+            }
         }
     </script>
 {% endblock %}

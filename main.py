@@ -15,90 +15,92 @@
 # [START app]
 
 # [START imports]
+import os.path
 import logging
-from flask import Flask, render_template, request, redirect, url_for, session, escape
+import json
+from datetime import timedelta
+from flask import Flask, render_template, request, redirect, url_for, session, escape, flash, app
+from google.appengine.ext import ndb
 
-from flask_mongoengine import MongoEngine, Document
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField
-from wtforms.validators import Email, Length, InputRequired
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+
 # [END imports]
 
 app = Flask(__name__)
-app.secret_key = '123'
-
-app.config['MONGODB_SETTINGS'] = {
-    'db': 'mitigating circumstances',
-    'host': 'mongodb://<---YOUR_DB_FULL URI--->'
-}
-
-db = MongoEngine(app)
-app.config['SECRET_KEY'] = 'secret_form_key'
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'login'
+app.secret_key = 'lU\x80P\x11N\xbc\x8c\xc6*g\xdb,\xcdjw\xb8<E\xab5\x7f\xc5H'
 
 
-class User(UserMixin, db.Document):
-    meta = {'collection': 'users'}
-    username = db.StringField(max_length=30)
-    password = db.StringField()
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(minutes=1)
 
 
-@login_manager.user_loader
-def load_user(user_id):
-    return User.objects(pk=user_id).first()
+class User(ndb.Model):
+    username = ndb.StringProperty()
+    password = ndb.StringProperty()
+    is_admin = ndb.BooleanProperty()
 
 
-class RegForm(FlaskForm):
-    username = StringField('username',  validators=[InputRequired(), Email(message='Invalid username'), Length(max=30)])
-    password = PasswordField('password', validators=[InputRequired(), Length(min=8, max=20)])
+@app.route('/')
+def base():
+
+    if 'username' in session:
+        user = User.query(User.username == session['username']).get()
+        if user:
+
+            user_dict = user.to_dict()
+            user_dict.pop('password', None)
+            return render_template('dashboard.html', user_data=json.dumps(user_dict, ensure_ascii=True))
+
+    return redirect(url_for('login'))
+
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def catch_all(path):
+    return redirect(url_for('base'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 
-    if current_user.is_authenticated:
-        return redirect(url_for('dashboard'))
+    if request.method == 'GET':
+        return render_template('login.html')
 
-    form = RegForm()
-    if request.method == 'POST':
+    elif request.method == 'POST':
 
-        if request.method == 'POST':
-            if form.validate():
-                check_user = User.objects(email=form.email.data).first()
-                if check_user:
-                    if check_password_hash(check_user['password'], form.password.data):
-                        login_user(check_user)
-                        return redirect(url_for('dashboard'))
+        post_username = request.form['username']
+        post_password = request.form['password']
 
-    return render_template('login.html', form=form)
+        user = User.query(User.username == post_username).get()
+
+        if user:
+            if check_password_hash(user.password, post_password):
+                session['username'] = user.username
+                return redirect(url_for('base'))
+            else:
+                flash('Incorrect Password.')
+        else:
+            flash('Unknown Username')
+
+        return redirect(url_for('login'))
 
 
-@app.route('/dashboard')
-@login_required
-def dashboard():
-    return render_template('dashboard.html', name=current_user.username)
-
-
-@app.route('/logout', methods = ['GET'])
-@login_required
+@app.route('/logout', methods=['POST'])
 def logout():
-    logout_user()
-    return redirect(url_for('login'))
+    session.clear()
+    return redirect(url_for('base'))
 
 
 @app.errorhandler(404)
-def not_found():
-    return render_template('errors/404.html')
+def page_not_found(exception):
+    return render_template('errors/404.html', error=exception), 404
 
 
 @app.errorhandler(500)
-def server_error(e):
-    # Log the error and stacktrace.
+def server_error(exception):
     logging.exception('An error occurred during a request.')
-    return render_template('errors/500.html', error=e)
+    return render_template('errors/500.html', error=exception)
 
 # [END app]

@@ -2,11 +2,17 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {BrowserRouter as Router, withRouter} from 'react-router-dom';
 import Routes from 'MCT/routes';
-
-import { Container, Row, Col } from 'reactstrap';
-
+import {Provider} from 'react-redux';
+import store from '../store';
+import {Container, Row, Col} from 'reactstrap';
 import Header from 'MCT/views/global/header';
-import Footer from "MCT/views/global/footer";
+import {connect} from 'react-redux';
+
+const mapStateToProps = state => {
+    return {
+        isAdmin: state.user.is_admin
+    }
+};
 
 /**
  * Main dashboard.html component
@@ -15,27 +21,20 @@ class Application extends React.Component {
 
     constructor(props) {
         super(props);
-
-        this.state = {
-            username: window.app.username
-        };
-
     }
 
     render() {
         return (
             <div>
-                <Header username={this.state.username}/>
+                <Header/>
 
                 <Container fluid={true}>
                     <Row>
                         <Col>
-                            <Routes isStaff={false}/>
+                            <Routes isAdmin={this.props.isAdmin}/>
                         </Col>
                     </Row>
                 </Container>
-
-                <Footer/>
             </div>
         );
     }
@@ -49,11 +48,14 @@ Application.mount = function (id) {
     const ThemedApplication = withRouter(Application);
 
     ReactDOM.render(
-        <Router>
-            <ThemedApplication/>
-        </Router>,
+        <Provider store={store}>
+            <Router>
+                <ThemedApplication/>
+            </Router>
+        </Provider>
+        ,
         document.getElementById(id)
     );
 };
 
-export default Application;
+export default connect(mapStateToProps)(Application);

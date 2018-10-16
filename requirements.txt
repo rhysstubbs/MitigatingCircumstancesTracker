@@ -1,5 +1,9 @@
+cffi==1.11.5
+Click==7.0
 Flask==1.0.2
-Werkzeug==0.14
-flask_mongoengine
-flask_wtf
-flask_login
+itsdangerous==0.24
+Jinja2==2.10
+MarkupSafe==1.0
+pycparser==2.19
+six==1.11.0
+Werkzeug==0.14.1

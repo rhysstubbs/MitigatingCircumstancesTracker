@@ -1,42 +1,43 @@
 import React from 'react';
 import {Route, Switch} from 'react-router-dom';
 import PropTypes from 'prop-types';
-
-import CaseViewer from '../views/view-all';
+import RequestList from 'MCT/views/view-all';
+import CaseSubmit from 'MCT/views/student/submit';
+import Dashboard from 'MCT/views/dashboard'
 
 class Routes extends React.Component {
 
     constructor(props) {
         super(props);
-
-        Routes.getStaffRoutes = Routes.getStaffRoutes().bind(this);
-        Routes.getStudentRoutes = Routes.getStudentRoutes.bind(this)
     }
 
-    static getStaffRoutes() {
+    static getAdminRoutes() {
         return (
-            {}
+            <Switch>
+                <Route exact path={"/"} component={Dashboard}/>
+                <Route exact path="/requests" component={RequestList}/>
+            </Switch>
         )
     }
 
     static getStudentRoutes() {
         return (
-            <Route exact path="/cases" component={CaseViewer}/>
+            <Switch>
+                <Route exact path={"/"} component={Dashboard}/>
+                <Route exact path="/requests" component={RequestList}/>
+                <Route exact path="/submit" component={CaseSubmit}/>
+            </Switch>
         )
     }
 
     render() {
-        return (
-            <Switch>
-                {this.props.isStaff ? Routes.getStaffRoutes() : Routes.getStudentRoutes()}
-            </Switch>
-        )
+        return this.props.isAdmin ? Routes.getAdminRoutes() : Routes.getStudentRoutes();
     }
 
 }
 
 Routes.propTypes = {
-    isStaff: PropTypes.bool
+    isAdmin: PropTypes.bool
 };
 
 export default Routes;
