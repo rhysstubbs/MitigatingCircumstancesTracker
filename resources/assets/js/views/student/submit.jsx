@@ -19,8 +19,8 @@ import Dropzone from 'react-dropzone'
 import {library} from '@fortawesome/fontawesome-svg-core'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 
-import { connect } from 'react-redux';
-import { addRequest} from "MCT/store/actions";
+import {connect} from 'react-redux';
+import {addRequest} from "MCT/store/actions";
 
 import {
     faFileWord,
@@ -30,6 +30,7 @@ import {
     faFileAlt,
     faFileImage
 } from '@fortawesome/free-solid-svg-icons';
+
 import {faFileUpload, faInfoCircle, faGraduationCap, faTimes} from '@fortawesome/free-solid-svg-icons';
 
 library.add(faFileUpload, faInfoCircle, faGraduationCap, faTimes);
@@ -39,6 +40,10 @@ const IconFileExtensionMappings = {
     pdf: "file-pdf",
     docx: "file-word",
     png: "file-image"
+};
+
+const mapDispatchToProps = {
+    addRequest,
 };
 
 class SubmitRequestView extends React.Component {
@@ -84,30 +89,11 @@ class SubmitRequestView extends React.Component {
         return fn.pop().toLowerCase();
     };
 
-    submit() {
+    submit(e) {
 
-        let errors = [];
-        /**Object.keys(this.state.formValues).forEach(function (key) {
+        e.preventDefault();
 
-            let val = this.state.formValues[key];
-            if (!val) {
-                errors.push(`Please complete the ${val} section`)
-            }
-        });*/
-
-        if (errors.length === 0) {
-
-            this.setState({
-                showErrors: true
-            });
-
-            this.dispatch(addRequest({
-                description: this.state.formValues.description
-            }))
-        } else {
-            console.log(this.state.formValues);
-        }
-
+        this.props.addRequest({});
     }
 
     removeFile(fileName) {
@@ -187,27 +173,32 @@ class SubmitRequestView extends React.Component {
                 <Col>
                     <h2>Submit a new request for mitigating circumstances</h2>
                     <hr/>
-
-                    <Form className={'mt-5'} onSubmit={this.submit()}>
+                    <Form className={'mt-5'} onSubmit={this.submit}>
 
                         <FormGroup>
-                            <Label for="description"><i className={'mr-2'}><FontAwesomeIcon icon={'info-circle'}
-                                                                                            color={'#CCCCCC'}/></i>Provide
-                                details:</Label>
+                            <Label for="description">
+                                <i className={'mr-2'}>
+                                    <FontAwesomeIcon icon={'info-circle'} color={'#CCCCCC'}/>
+                                </i>
+                                Provide details:
+                            </Label>
                             <Input type="textarea"
                                    name="description"
                                    id="description"
                                    rows={8}
                                    onChange={this.handleChange}
                                    value={this.state.description}
-                                   placeholder="Description/Explanation/Reasoning..."
+                                   placeholder="Description"
                             />
                         </FormGroup>
 
                         <FormGroup>
-                            <Label><i className={'mr-2'}><FontAwesomeIcon icon={'graduation-cap'}
-                                                                          color={'#CCCCCC'}/></i>Which subject(s) does
-                                this affect?</Label>
+                            <Label>
+                                <i className={'mr-2'}>
+                                    <FontAwesomeIcon icon={'graduation-cap'} color={'#CCCCCC'}/>
+                                </i>
+                                Which subject(s) does this affect?
+                            </Label>
                             <Select
                                 value={this.state.subjects}
                                 onChange={this.handleChange}
@@ -281,13 +272,11 @@ class SubmitRequestView extends React.Component {
 
                         <Button color="primary" size={'lg'} type={'submit'}>Submit for Review</Button>
                         <FormText>All information provide is confidential.</FormText>
-
                     </Form>
-
                 </Col>
             </Row>
         );
     }
 }
 
-export default connect()(SubmitRequestView);
+export default connect(null, mapDispatchToProps)(SubmitRequestView);

@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import {BrowserRouter as Router, withRouter} from 'react-router-dom';
 import Routes from 'MCT/routes';
 import {Provider} from 'react-redux';
-import store from '../store';
+import configureStore from 'MCT/store/index';
 import {Container, Row, Col} from 'reactstrap';
 import Header from 'MCT/views/global/header';
 import {connect} from 'react-redux';
@@ -31,7 +31,7 @@ class Application extends React.Component {
                 <Container fluid={true}>
                     <Row>
                         <Col>
-                            <Routes isAdmin={this.state.isAdmin}/>
+                            <Routes isAdmin={this.props.isAdmin}/>
                         </Col>
                     </Row>
                 </Container>
@@ -46,6 +46,10 @@ class Application extends React.Component {
 Application.mount = function (id) {
 
     const ThemedApplication = withRouter(Application);
+
+    const initialState = window.app;
+
+    const store = configureStore(initialState);
 
     ReactDOM.render(
         <Provider store={store}>

@@ -1,22 +1,21 @@
-import {ADD_REQUEST, EDIT_REQUEST, DELETE_REQUEST} from '../action-types';
+import {ADD_REQUEST, EDIT_REQUEST, DELETE_REQUEST} from '../action-types/action-types';
 
-const initialState = [];
+const initialState = window.app.data.requests;
 
 const requests = (state = initialState, action) => {
     switch (action.type) {
 
         case ADD_REQUEST:
-
-            console.log("IT WORKED!", action);
-
+            console.log("ADD_REQUEST", action);
             return state;
-            //return {...state, articles: state.articles.concat(action.payload)};
 
         case EDIT_REQUEST:
-            return;
+            console.log("EDIT_REQUEST", action);
+            return state;
 
         case DELETE_REQUEST:
-            return;
+            console.log("DELETE_REQUEST", action);
+            return state;
 
         default:
             return state;

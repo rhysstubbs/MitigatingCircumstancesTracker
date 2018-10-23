@@ -59,7 +59,7 @@ def login():
             stored_role = bool(json_dict['isAdmin'])
 
             if stored_password == post_password:
-                session['user'] = load_user_data(username=post_username, role=stored_role)
+                session['user'] = load_user_data(username=post_username, is_admin=stored_role)
                 return redirect(url_for('base'))
             else:
                 flash('Incorrect Password')
@@ -71,10 +71,14 @@ def login():
     return redirect(url_for('login'))
 
 
-# @cache.cached(timeout=30, key_prefix='current_user')
 def load_user_data(username, is_admin):
     conn = httplib.HTTPSConnection(API_URL)
-    conn.request('GET', "/request?username=%s" % username)
+
+    if not is_admin:
+        conn.request('GET', "/request?username=%s" % username)
+    else:
+        conn.request('GET', "/request")
+
     response = conn.getresponse()
     conn.close()
 

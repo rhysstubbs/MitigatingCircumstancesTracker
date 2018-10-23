@@ -1,4 +1,4 @@
-import {ADD_REQUEST, EDIT_REQUEST, DELETE_REQUEST} from "MCT/store/action-types";
+import {ADD_REQUEST, EDIT_REQUEST, DELETE_REQUEST} from "MCT/store/action-types/action-types";
 
 const addRequest = request => (
     {
@@ -11,15 +11,17 @@ const addRequest = request => (
 
 const editRequest = request => (
     {
-        type: EDIT_REQUEST
+        type: EDIT_REQUEST,
+        payload: request
     }
 );
 
 const deleteRequest = request => (
     {
-        type: DELETE_REQUEST
+        type: DELETE_REQUEST,
     }
 );
+
 
 export {
     addRequest,

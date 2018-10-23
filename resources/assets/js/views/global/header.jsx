@@ -55,7 +55,7 @@ class Header extends React.Component {
                                 </button>
 
                                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
-                                    {false ? Header.getAdminLinks() : Header.getStudentLinks()}
+                                    {this.props.user.isAdmin ? Header.getAdminLinks() : Header.getStudentLinks()}
                                     <form className="form-inline my-2 my-lg-0" action="/logout" method="POST">
                                         <button className="btn btn-outline-success my-2 my-sm-0" type="submit">Logout
                                             - {this.props.user.username}</button>

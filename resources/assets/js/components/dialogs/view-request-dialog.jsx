@@ -21,8 +21,14 @@ import Moment from 'react-moment';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faTimes, faFile} from '@fortawesome/free-solid-svg-icons';
+import {editRequest} from "MCT/store/actions";
 
 library.add(faTimes, faFile);
+import {connect} from 'react-redux';
+
+const mapDispatchToProps = {
+    editRequest,
+};
 
 function Transition(props) {
     return <Slide direction="up" {...props} />;
@@ -150,7 +156,6 @@ class ViewRequestDialog extends React.Component {
         this.state = {};
         this.initialState = this.state;
 
-        console.log(this);
         this.close = this.close.bind(this);
     }
 
@@ -241,8 +246,8 @@ class ViewRequestDialog extends React.Component {
                                 </CardContent>
 
                                 <CardActions>
-                                    <Button variant={'contained'} color="secondary" className={'mr-3'}>Approve</Button>
-                                    <Button variant={"contained"} color="primary" className={'mr-3'}>Archive</Button>
+                                    <Button onClick={() => this.props.editRequest({status: "Approved"})} variant={'contained'} color="secondary" className={'mr-3'}>Approve</Button>
+                                    <Button onClick={() => this.props.editRequest({status: "Archived"})} variant={"contained"} color="primary" className={'mr-3'}>Archive</Button>
                                 </CardActions>
                             </Card>
                         </Paper>
@@ -261,4 +266,4 @@ ViewRequestDialog.propTypes = {
     onClose: PropTypes.func
 };
 
-export default withStyles(styles)(ViewRequestDialog);
+export default connect(null, mapDispatchToProps)(withStyles(styles)(ViewRequestDialog));

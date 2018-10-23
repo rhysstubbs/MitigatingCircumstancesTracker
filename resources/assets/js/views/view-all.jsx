@@ -5,11 +5,14 @@ import DialogLauncher from "MCT/components/core/dialog-launcher";
 import ViewRequestDialog from "MCT/components/dialogs/view-request-dialog";
 import Table from 'MCT/components/core/table';
 import Moment from "react-moment";
+import Button from "@material-ui/core/Button/Button";
+
+import StoreButton from "MCT/components/core/store-button";
 
 const mapStateToProps = state => {
     return {
         requests: state.requests,
-        isAdmin: state.user.is_admin
+        isAdmin: state.user.isAdmin
     }
 };
 
@@ -47,6 +50,21 @@ const columns = [
     {
         Header: 'Description',
         accessor: 'description'
+    },
+    {
+        Header: '',
+        type: 'store-button',
+        className: 'action',
+        isAdmin: false,
+        headerClassName: 'action',
+        Cell: (row) => {
+            return (
+                <StoreButton
+                    buttonText={'Cancel'}
+                    action={'deleteRequest'}
+                />
+            )
+        }
     },
     {
         Header: '',
