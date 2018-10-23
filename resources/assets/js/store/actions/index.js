@@ -1,6 +1,6 @@
-import { ADD_REQUEST } from "MCT/store/action-types";
+import {ADD_REQUEST, EDIT_REQUEST, DELETE_REQUEST} from "MCT/store/action-types";
 
-export const addRequest = request => (
+const addRequest = request => (
     {
         type: ADD_REQUEST,
         payload: {
@@ -8,3 +8,21 @@ export const addRequest = request => (
         }
     }
 );
+
+const editRequest = request => (
+    {
+        type: EDIT_REQUEST
+    }
+);
+
+const deleteRequest = request => (
+    {
+        type: DELETE_REQUEST
+    }
+);
+
+export {
+    addRequest,
+    editRequest,
+    deleteRequest
+}

@@ -204,7 +204,10 @@ module.exports = {
             }
         }),
         new WebpackBuildNotifierPlugin({
-            title: "MitigatingCircumstancesTracker"
+            title: "MitigatingCircumstancesTracker",
+            successIcon:  path.resolve(__dirname, 'resources/assets/images/build-icons/success.png'),
+            warningIcon: path.resolve(__dirname, 'resources/assets/images/build-icons/warning.png'),
+            failureIcon: path.resolve(__dirname, 'resources/assets/images/build-icons/failure.png')
         })
     ],
     optimization: {
@@ -245,6 +248,7 @@ module.exports = {
     resolve: {
         extensions: [ '*', '.js', '.jsx' ],
         alias: {
+            "./icons": path.resolve('./resources/assets/images/build-icons'),
             "MCT": path.resolve('./resources/assets/js'),
             "matches-selector/matches-selector": "desandro-matches-selector",
             "eventEmitter/EventEmitter": "wolfy87-eventemitter",

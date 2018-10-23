@@ -1,27 +1,9 @@
-import {ADD_REQUEST} from '../action-types';
+import { combineReducers } from 'redux';
 
-const initialState = {
-    user: window.app.data.user,
-    requests: [
-        {
-            id: "MCR-001",
-            status: "In Review",
-            dateSubmitted: 1538406743,
-            desc: "This is a test"
-        }
-    ]
-};
+import requests from './requests';
+import user from './user';
 
-const rootReducer = (state = initialState, action) => {
-
-    switch (action.type) {
-
-        case ADD_REQUEST:
-            return {...state, articles: state.articles.concat(action.payload)};
-
-        default:
-            return state;
-    }
-};
-
-export default rootReducer;
+export default combineReducers({
+    requests,
+    user
+});

@@ -3,6 +3,26 @@ import {withStyles} from '@material-ui/core/styles';
 import Slide from '@material-ui/core/Slide';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
+import Button from '@material-ui/core/Button';
+import AppBar from '@material-ui/core/AppBar';
+import Paper from '@material-ui/core/Paper';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import PropTypes from 'prop-types';
+import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import List from '@material-ui/core/List';
+import Avatar from '@material-ui/core/Avatar';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import Moment from 'react-moment';
+
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faTimes, faFile} from '@fortawesome/free-solid-svg-icons';
+
+library.add(faTimes, faFile);
 
 function Transition(props) {
     return <Slide direction="up" {...props} />;
@@ -127,28 +147,106 @@ class ViewRequestDialog extends React.Component {
     constructor(props) {
         super(props);
 
-        this.classes = this.props.classes;
-
         this.state = {};
-
         this.initialState = this.state;
-        this.handleExit = this.handleExit.bind(this);
+
+        console.log(this);
+        this.close = this.close.bind(this);
     }
 
-    handleExit() {
+    close() {
+        this.props.onClose();
         this.setState(this.initialState);
     }
 
     render() {
         return (
             <div>
-                <Dialog fullScreen
+                <Dialog fullScreen={true}
                         open={this.props.open}
                         TransitionComponent={Transition}
                         onClose={this.props.onClose}
-                        onExited={this.handleExit}>
+                        onExited={() => this.setState(this.initialState)}>
 
-                    <DialogContent className={this.classes.content}>
+                    <DialogContent style={{paddingTop: 80}}>
+                        <AppBar>
+                            <Toolbar>
+                                <div style={{display: 'flex', flexGrow: 1}}>
+                                    <Typography variant="title" color="inherit" noWrap className={'mr-5'}>
+                                        {`Request`}
+                                    </Typography>
+                                </div>
+
+                                <Button onClick={this.close} color={"default"} style={{color: '#fff'}}>
+                                    Close
+                                </Button>
+                            </Toolbar>
+                        </AppBar>
+
+                        <Paper elevation={1}>
+                            <Card>
+                                <CardContent>
+                                    <Typography variant={"headline"} gutterBottom>
+                                        Details:
+                                    </Typography>
+
+                                    <Typography color="textPrimary" gutterBottom>
+                                        ID: <span className={'text-secondary'}>{this.props.data.id}</span>
+                                    </Typography>
+
+                                    <Typography color="textPrimary" gutterBottom>
+                                        Status: <span className={'text-secondary'}>{this.props.data.status}</span>
+                                    </Typography>
+
+                                    <Typography color="textPrimary" gutterBottom>
+                                        Date Submitted: <span className={'text-secondary'}><Moment
+                                        format="DD/MM/YYYY">{this.props.data.dateSubmitted}</Moment></span>
+                                    </Typography>
+
+                                    <hr/>
+
+                                    <div>
+                                        <Typography variant={"headline"} gutterBottom>
+                                            Description:
+                                        </Typography>
+
+                                        <Typography variant={"body1"}>{this.props.data.description}</Typography>
+                                    </div>
+
+                                    <hr/>
+
+                                    <List>
+                                        <ListItem>
+                                            <Avatar>
+                                                <FontAwesomeIcon icon={"file"}/>
+                                            </Avatar>
+                                            <ListItemText primary="Photos" secondary="Jan 9, 2014"/>
+                                        </ListItem>
+
+                                        <ListItem>
+                                            <Avatar>
+                                                <FontAwesomeIcon icon={"file"}/>
+                                            </Avatar>
+                                            <ListItemText primary="Work" secondary="Jan 7, 2014"/>
+                                        </ListItem>
+
+                                        <ListItem>
+                                            <Avatar>
+                                                <FontAwesomeIcon icon={"file"}/>
+                                            </Avatar>
+                                            <ListItemText primary="Vacation" secondary="July 20, 2014"/>
+                                        </ListItem>
+                                    </List>
+
+                                </CardContent>
+
+                                <CardActions>
+                                    <Button variant={'contained'} color="secondary" className={'mr-3'}>Approve</Button>
+                                    <Button variant={"contained"} color="primary" className={'mr-3'}>Archive</Button>
+                                </CardActions>
+                            </Card>
+                        </Paper>
+
 
                     </DialogContent>
                 </Dialog>
@@ -156,5 +254,11 @@ class ViewRequestDialog extends React.Component {
         );
     }
 }
+
+ViewRequestDialog.propTypes = {
+    data: PropTypes.object,
+    open: PropTypes.bool,
+    onClose: PropTypes.func
+};
 
 export default withStyles(styles)(ViewRequestDialog);

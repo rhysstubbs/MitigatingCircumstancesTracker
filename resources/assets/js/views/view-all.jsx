@@ -1,23 +1,16 @@
 import React from "react";
-import ReactTable from 'react-table';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {ReactTableDefaults} from "react-table";
-import DialogLauncher from "MCT/components/dialog-launcher";
+import DialogLauncher from "MCT/components/core/dialog-launcher";
 import ViewRequestDialog from "MCT/components/dialogs/view-request-dialog";
-import ArchiveRequestDialog from "MCT/components/dialogs/archive-request-dialog"
-
-Object.assign(ReactTableDefaults, {
-    showPagination: false,
-    filterable: false,
-    sortable: false,
-    resizable: false,
-    minRows: 0,
-    defaultPageSize: 10,
-});
+import Table from 'MCT/components/core/table';
+import Moment from "react-moment";
 
 const mapStateToProps = state => {
-    return {requests: state.requests}
+    return {
+        requests: state.requests,
+        isAdmin: state.user.is_admin
+    }
 };
 
 const columns = [
@@ -27,33 +20,49 @@ const columns = [
     },
     {
         Header: "Status",
-        accessor: "status"
+        accessor: "status",
+        Cell: row => {
+
+            const status = row.original.status;
+            let color = "";
+
+            if (status === "Submitted") {
+                color = "#85cc00"
+            }
+
+            return (
+                <p style={{color: color}} className={'m-0 p-0'}>{status}</p>
+            )
+        }
     },
     {
         Header: "Date Submitted",
-        accessor: "dateSubmitted"
+        accessor: "dateSubmitted",
+        Cell: (row) => {
+            return (
+                <Moment format="DD/MM/YYYY @ hh:mm">{row.original.dateSubmitted}</Moment>
+            )
+        }
     },
     {
         Header: 'Description',
-        accessor: 'desc'
+        accessor: 'description'
     },
     {
         Header: '',
         type: 'custom',
         className: 'action',
+        isAdmin: true,
         headerClassName: 'action',
         Cell: (row) => {
             return (
-                <div>
-                    <DialogLauncher className={"btn-mini outlined-primary"}
-                                    dialog={ViewRequestDialog}
-                                    dialogData={row.original}
-                                    buttonText='View'
-                                    variant="outlined"
-                                    color="primary"
-                                    size="small"/>
-                </div>
-
+                <DialogLauncher className={"btn-mini outlined-primary"}
+                                dialog={ViewRequestDialog}
+                                dialogData={row.original}
+                                buttonText='View'
+                                variant="outlined"
+                                color="primary"
+                                size="small"/>
             );
         }
     },
@@ -68,10 +77,12 @@ class RequestList extends React.Component {
     }
 
     getColumnsForUser() {
+
         if (this.props.isAdmin) {
-            return columns.filter((col) => col.isAdmin);
+            return columns;
         } else {
-            return columns.filter((col) => !col.isAdmin);
+
+            return columns.filter((col) => !col.hasOwnProperty('isAdmin') || col.isAdmin === false);
         }
     }
 
@@ -83,17 +94,8 @@ class RequestList extends React.Component {
                 <hr/>
 
                 <div>
-                    <ReactTable
-                        columns={columns}
-                        data={this.props.requests}
-                        getTdProps={(state, rowInfo, column) => {
-                            if ((column.type === 'action' || column.type === 'custom') && typeof column.Cell === 'function') {
-                                return column.Cell;
-                            }
-                            return column;
-                        }}
-
-                    />
+                    <Table data={this.props.requests}
+                           columns={this.getColumnsForUser()}/>
                 </div>
             </div>
         );

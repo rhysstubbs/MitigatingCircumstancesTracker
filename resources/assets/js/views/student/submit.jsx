@@ -19,6 +19,9 @@ import Dropzone from 'react-dropzone'
 import {library} from '@fortawesome/fontawesome-svg-core'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 
+import { connect } from 'react-redux';
+import { addRequest} from "MCT/store/actions";
+
 import {
     faFileWord,
     faFilePowerpoint,
@@ -81,16 +84,16 @@ class SubmitRequestView extends React.Component {
         return fn.pop().toLowerCase();
     };
 
-    submit(event) {
+    submit() {
 
         let errors = [];
-        Object.keys(this.state.formValues).forEach(function (key) {
+        /**Object.keys(this.state.formValues).forEach(function (key) {
 
             let val = this.state.formValues[key];
             if (!val) {
                 errors.push(`Please complete the ${val} section`)
             }
-        });
+        });*/
 
         if (errors.length === 0) {
 
@@ -98,7 +101,9 @@ class SubmitRequestView extends React.Component {
                 showErrors: true
             });
 
-            return false;
+            this.dispatch(addRequest({
+                description: this.state.formValues.description
+            }))
         } else {
             console.log(this.state.formValues);
         }
@@ -183,7 +188,7 @@ class SubmitRequestView extends React.Component {
                     <h2>Submit a new request for mitigating circumstances</h2>
                     <hr/>
 
-                    <Form className={'mt-5'}>
+                    <Form className={'mt-5'} onSubmit={this.submit()}>
 
                         <FormGroup>
                             <Label for="description"><i className={'mr-2'}><FontAwesomeIcon icon={'info-circle'}
@@ -274,7 +279,7 @@ class SubmitRequestView extends React.Component {
                             </div>
                         </FormGroup>
 
-                        <Button color="primary" size={'lg'} onClick={this.submit}>Submit for Review</Button>
+                        <Button color="primary" size={'lg'} type={'submit'}>Submit for Review</Button>
                         <FormText>All information provide is confidential.</FormText>
 
                     </Form>
@@ -285,4 +290,4 @@ class SubmitRequestView extends React.Component {
     }
 }
 
-export default SubmitRequestView;
+export default connect()(SubmitRequestView);

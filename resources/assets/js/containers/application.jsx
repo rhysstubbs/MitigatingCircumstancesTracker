@@ -10,12 +10,12 @@ import {connect} from 'react-redux';
 
 const mapStateToProps = state => {
     return {
-        isAdmin: state.user.is_admin
+        isAdmin: state.user.isAdmin
     }
 };
 
 /**
- * Main dashboard.html component
+ * Main dashboard component
  */
 class Application extends React.Component {
 
@@ -31,7 +31,7 @@ class Application extends React.Component {
                 <Container fluid={true}>
                     <Row>
                         <Col>
-                            <Routes isAdmin={this.props.isAdmin}/>
+                            <Routes isAdmin={this.state.isAdmin}/>
                         </Col>
                     </Row>
                 </Container>

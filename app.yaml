@@ -15,3 +15,15 @@ libraries:
 - name: ssl
   version: latest
 # [END libraries]
+
+# [START skipped_files]
+skip_files:
+- ^(.*/)?.*/node_modules/.*$
+- ^(node_modules/.*)
+- ^(resources/.*)
+- ^\.idea$
+- ^\.MCTAPI-1bc8f5d2d36a.json$
+# [END skipped_files]
+
+builtins:
+- remote_api: on
