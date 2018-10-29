@@ -155,14 +155,12 @@ class ViewRequestDialog extends React.Component {
 
         this.state = {};
         this.initialState = this.state;
-
-        this.close = this.close.bind(this);
     }
 
-    close() {
+    close = () => {
         this.props.onClose();
         this.setState(this.initialState);
-    }
+    };
 
     render() {
         return (

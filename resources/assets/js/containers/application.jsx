@@ -6,13 +6,8 @@ import {Provider} from 'react-redux';
 import configureStore from 'MCT/store/index';
 import {Container, Row, Col} from 'reactstrap';
 import Header from 'MCT/views/global/header';
-import {connect} from 'react-redux';
 
-const mapStateToProps = state => {
-    return {
-        isAdmin: state.user.isAdmin
-    }
-};
+const initialState = window.app;
 
 /**
  * Main dashboard component
@@ -31,7 +26,7 @@ class Application extends React.Component {
                 <Container fluid={true}>
                     <Row>
                         <Col>
-                            <Routes isAdmin={this.props.isAdmin}/>
+                            <Routes isAdmin={initialState.user.isAdmin}/>
                         </Col>
                     </Row>
                 </Container>
@@ -41,14 +36,11 @@ class Application extends React.Component {
 }
 
 /**
- * Static helper to mount the dashboard.html in an element by ID
+ * Static helper to mount the application in an element by ID
  */
 Application.mount = function (id) {
 
     const ThemedApplication = withRouter(Application);
-
-    const initialState = window.app;
-
     const store = configureStore(initialState);
 
     ReactDOM.render(
@@ -62,4 +54,4 @@ Application.mount = function (id) {
     );
 };
 
-export default connect(mapStateToProps)(Application);
+export default Application;

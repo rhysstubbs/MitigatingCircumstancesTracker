@@ -5,7 +5,7 @@ import ApplicationContainer from './containers/application';
 
 const appContainer = 'app';
 
-// Mount the dashboard.html
+// Mount the application
 if (document.getElementById(appContainer) != null) {
     ApplicationContainer.mount(appContainer);
 }

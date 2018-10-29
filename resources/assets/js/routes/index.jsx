@@ -3,7 +3,7 @@ import {Route, Switch} from 'react-router-dom';
 import PropTypes from 'prop-types';
 import RequestList from 'MCT/views/view-all';
 import CaseSubmit from 'MCT/views/student/submit';
-import Dashboard from 'MCT/views/dashboard'
+import Dashboard from 'MCT/views/dashboard';
 
 class Routes extends React.Component {
 
@@ -37,7 +37,7 @@ class Routes extends React.Component {
 }
 
 Routes.propTypes = {
-    isAdmin: PropTypes.bool
+    isAdmin: PropTypes.bool.isRequired
 };
 
 export default Routes;

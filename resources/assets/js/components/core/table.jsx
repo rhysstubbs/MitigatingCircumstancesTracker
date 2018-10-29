@@ -4,12 +4,12 @@ import PropTypes from 'prop-types';
 import {ReactTableDefaults} from "react-table";
 
 Object.assign(ReactTableDefaults, {
-    showPagination: false,
+    showPagination: true,
     filterable: false,
-    sortable: false,
+    sortable: true,
     resizable: false,
-    minRows: 0,
-    defaultPageSize: 10,
+    minRows: 15,
+    defaultPageSize: 15,
 });
 
 class RequestList extends React.Component {
@@ -37,8 +37,8 @@ class RequestList extends React.Component {
 }
 
 RequestList.propTypes = {
-    data: PropTypes.array,
-    columns: PropTypes.array
+    data: PropTypes.array.isRequired,
+    columns: PropTypes.array.isRequired
 };
 
 export default RequestList;

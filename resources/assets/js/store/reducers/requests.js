@@ -1,24 +1,31 @@
-import {ADD_REQUEST, EDIT_REQUEST, DELETE_REQUEST} from '../action-types/action-types';
+import {ADD_REQUEST, EDIT_REQUEST, DELETED_REQUEST, ARCHIVE_REQUEST} from '../action-types/requests';
 
-const initialState = window.app.data.requests;
+const requests = (state = null, action) => {
+    if (!!action.type) {
+        switch (action.type) {
 
-const requests = (state = initialState, action) => {
-    switch (action.type) {
+            case ADD_REQUEST:
+                return [...state, action.payload];
 
-        case ADD_REQUEST:
-            console.log("ADD_REQUEST", action);
-            return state;
+            case ARCHIVE_REQUEST:
+                return state;
 
-        case EDIT_REQUEST:
-            console.log("EDIT_REQUEST", action);
-            return state;
+            case EDIT_REQUEST:
+                return state;
 
-        case DELETE_REQUEST:
-            console.log("DELETE_REQUEST", action);
-            return state;
+            case DELETED_REQUEST:
 
-        default:
-            return state;
+                console.log("DELETING", true, action.payload);
+
+                return state.filter(request => {
+                    return request.id !== action.payload
+                });
+
+            default:
+                return state;
+        }
+    } else {
+        return state;
     }
 };
 

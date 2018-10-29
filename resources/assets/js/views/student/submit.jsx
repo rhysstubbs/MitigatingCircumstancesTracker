@@ -1,4 +1,11 @@
 import React from "react";
+import Select from 'react-select';
+import Dropzone from 'react-dropzone'
+import {library} from '@fortawesome/fontawesome-svg-core'
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+
+import {connect} from 'react-redux';
+import {postRequest} from "MCT/store/action-creators/requests";
 
 import {
     Row,
@@ -13,14 +20,6 @@ import {
     FormText,
     Alert
 } from 'reactstrap';
-
-import Select from 'react-select';
-import Dropzone from 'react-dropzone'
-import {library} from '@fortawesome/fontawesome-svg-core'
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-
-import {connect} from 'react-redux';
-import {addRequest} from "MCT/store/actions";
 
 import {
     faFileWord,
@@ -43,7 +42,7 @@ const IconFileExtensionMappings = {
 };
 
 const mapDispatchToProps = {
-    addRequest,
+    postRequest
 };
 
 class SubmitRequestView extends React.Component {
@@ -62,10 +61,6 @@ class SubmitRequestView extends React.Component {
             fileUploadErrors: [],
             showErrors: false
         };
-
-        this.submit = this.submit.bind(this);
-        this.handleChange = this.handleChange.bind(this);
-        this.removeFile = this.removeFile.bind(this)
     }
 
     static getIconForFileType(fileName) {
@@ -89,14 +84,21 @@ class SubmitRequestView extends React.Component {
         return fn.pop().toLowerCase();
     };
 
-    submit(e) {
+    submit = (event) => {
 
-        e.preventDefault();
+        event.preventDefault();
 
-        this.props.addRequest({});
-    }
+        let request = {
+            description: this.state.description
+        };
 
-    removeFile(fileName) {
+
+        this.props.postRequest(request).then(() => {
+            this.props.history.push('/requests');
+        });
+    };
+
+    removeFile = (fileName) => {
 
         let currentFiles = this.state.formValues.files;
 
@@ -116,9 +118,9 @@ class SubmitRequestView extends React.Component {
                 }
             })
         }
-    }
+    };
 
-    handleChange(event) {
+    handleChange = (event) => {
         this.setState({
             [event.target.name]: event.target.value
         });
