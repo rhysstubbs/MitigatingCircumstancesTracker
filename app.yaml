@@ -6,8 +6,10 @@ threadsafe: true
 handlers:
 - url: /public
   static_dir: public
+  secure: always
 - url: /.*
   script: main.app
+  secure: always
 # [END handlers]
 
 # [START libraries]

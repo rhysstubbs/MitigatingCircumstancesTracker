@@ -6,6 +6,7 @@ import {Provider} from 'react-redux';
 import configureStore from 'MCT/store/index';
 import {Container, Row, Col} from 'reactstrap';
 import Header from 'MCT/views/global/header';
+import { ToastContainer, toast } from 'react-toastify';
 
 const initialState = window.app;
 
@@ -30,6 +31,11 @@ class Application extends React.Component {
                         </Col>
                     </Row>
                 </Container>
+
+                {/** Global Components */}
+
+                <ToastContainer hideProgressBar={true} autoClose={8000} />
+
             </div>
         );
     }

@@ -14596,6 +14596,12 @@ button.close {
   background-color: #fff !important;
 }
 
+button:focus-within,
+button:focus,
+button:active {
+  box-shadow: none !important;
+}
+
 #navbar .navbar-brand img {
   width: 200px;
   max-width: 100%;

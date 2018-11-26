@@ -15,19 +15,39 @@ import CardContent from '@material-ui/core/CardContent';
 import List from '@material-ui/core/List';
 import Avatar from '@material-ui/core/Avatar';
 import ListItem from '@material-ui/core/ListItem';
+import TextField from '@material-ui/core/TextField';
+import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
+import {withRouter, Link} from 'react-router-dom';
+import {compose} from "recompose";
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import Moment from 'react-moment';
+import DeleteIcon from '@material-ui/icons/Delete';
+import IconButton from '@material-ui/core/IconButton';
+
+import DownloadIcon from '@material-ui/icons/CloudDownload';
+import FileIcon from '@material-ui/icons/FileCopy';
 
 import {library} from '@fortawesome/fontawesome-svg-core';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faTimes, faFile} from '@fortawesome/free-solid-svg-icons';
-import {editRequest} from "MCT/store/actions";
+import {markRequestAs} from "MCT/store/action-creators/requests";
+import Loader from 'MCT/components/core/loader';
+
+import {REQUEST_APPROVED, REQUEST_ARCHIVED} from 'MCT/constants/request-status';
+import {toast} from 'react-toastify';
 
 library.add(faTimes, faFile);
 import {connect} from 'react-redux';
 
 const mapDispatchToProps = {
-    editRequest,
+    markRequestAs,
+};
+
+const mapStateToProps = state => {
+    return {
+        user: state.user
+    }
 };
 
 function Transition(props) {
@@ -153,115 +173,322 @@ class ViewRequestDialog extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = {};
+        this.state = {
+            loading: false,
+            reasonToDeny: "",
+            draws: {
+                denyDrawIsOpen: false,
+            }
+        };
+
         this.initialState = this.state;
     }
 
+    toggleDrawer = (side, open) => () => {
+
+        if (side === '*' && open === false) {
+
+            Object.keys(this.state.draws).forEach((key) => {
+                this.setState({
+                    [key]: open
+                });
+            })
+        }
+
+        this.setState({
+            draws: {
+                [side]: open
+            },
+        });
+    };
+
+    markAsDenied = (event) => {
+
+        this.setState({
+            loading: true
+        });
+
+        const payload = {
+            requestId: this.props.data.id,
+            status: REQUEST_ARCHIVED,
+            reason: this.state.reasonToDeny
+        };
+
+        this.props.markRequestAs(payload)
+            .then((response) => {
+                toast.success(
+                    `Request ${this.props.data.id} was saved.`,
+                    {
+                        position: toast.POSITION.TOP_RIGHT
+                    }
+                )
+            })
+            .then((response) => {
+
+                this.setState(this.initialState);
+
+                return response;
+            })
+            .then(response => this.close());
+    };
+
+    markAs = (status) => {
+        this.setState({
+            loading: true
+        });
+
+        const payload = {
+            requestId: this.props.data.id,
+            status: status,
+        };
+
+        this.props.markRequestAs(payload)
+            .then((response) => {
+                toast.success(
+                    `Request ${this.props.data.id} was saved.`,
+                    {
+                        position: toast.POSITION.TOP_RIGHT
+                    }
+                );
+                return response;
+            })
+            .then((response) => {
+
+                this.setState(this.initialState);
+
+                return response;
+            })
+            .then(response => this.close());
+
+    };
+
+    getEvidenceFiles = () => {
+
+        const files = this.props.data.files;
+
+        if (files && files.length > 0) {
+
+            return (
+                <List>
+                    {files.map((file) => {
+                        return (
+                            <ListItem key={`${file.name}_${Math.random()}`}>
+                                <ListItemAvatar>
+                                    <Avatar>
+                                        <FileIcon color={"action"}/>
+                                    </Avatar>
+                                </ListItemAvatar>
+                                <ListItemText primary={file.name.toLowerCase()}/>
+                                <ListItemSecondaryAction>
+                                    <IconButton aria-label="Delete">
+                                        <DeleteIcon/>
+                                    </IconButton>
+                                    <a href={file.link}>
+                                        <IconButton aria-label="Download">
+                                            <DownloadIcon/>
+                                        </IconButton>
+                                    </a>
+
+                                </ListItemSecondaryAction>
+                            </ListItem>
+                        )
+                    })}
+                </List>
+            )
+        } else {
+
+            return (<Typography variant={"body1"}>{"No Evidence was submitted."}</Typography>)
+        }
+    };
+
+    getStudentActions = () => {
+        return (
+            <div></div>
+        )
+    };
+
+    getAdminActions = () => {
+        const status = this.props.data.status;
+        let actions = [];
+
+        if (status === 'Submitted') {
+
+            actions.push(
+                <Button onClick={this.markAs.bind(null, REQUEST_APPROVED)}
+                        variant={'contained'}
+                        color="secondary"
+                        className={'mr-3'}>Approve</Button>
+            );
+
+            actions.push(
+                <Button onClick={this.toggleDrawer('denyDrawIsOpen', true)}
+                        variant={"contained"}
+                        color="primary"
+                        className={'mr-3'}>Deny</Button>
+            );
+
+
+        } else if (status !== 'Submitted' && status !== 'Archived') {
+            actions.push(
+                <Button
+                    onClick={this.markAs.bind(null, REQUEST_ARCHIVED)}
+                    variant={'contained'}
+                    color="secondary"
+                    className={'mr-3'}>Archive</Button>
+            );
+        }
+
+        return actions.map((action) => action);
+    };
+
+    handleChange = name => event => {
+        this.setState({
+            [name]: event.target.value,
+        });
+    };
+
     close = () => {
         this.props.onClose();
-        this.setState(this.initialState);
     };
 
     render() {
-        return (
-            <div>
-                <Dialog fullScreen={true}
-                        open={this.props.open}
-                        TransitionComponent={Transition}
-                        onClose={this.props.onClose}
-                        onExited={() => this.setState(this.initialState)}>
+        return <div>
+            <Dialog fullScreen={true}
+                    open={this.props.open}
+                    TransitionComponent={Transition}
+                    onClose={this.props.onClose}
+                    onExited={() => this.setState(this.initialState)}>
 
-                    <DialogContent style={{paddingTop: 80}}>
-                        <AppBar>
-                            <Toolbar>
-                                <div style={{display: 'flex', flexGrow: 1}}>
-                                    <Typography variant="title" color="inherit" noWrap className={'mr-5'}>
-                                        {`Request`}
+                <Loader isLoading={this.state.loading} fullScreen={true}/>
+
+                <DialogContent style={{paddingTop: 80}}>
+                    <AppBar>
+                        <Toolbar>
+                            <div style={{display: 'flex', flexGrow: 1}}>
+                                <Typography variant="title" color="inherit" noWrap className={'mr-5'}>
+                                    {`Request`}
+                                </Typography>
+                            </div>
+
+                            <Button onClick={this.close} color={"default"} style={{color: '#fff'}}>
+                                Close
+                            </Button>
+                        </Toolbar>
+                    </AppBar>
+
+                    <Paper elevation={1}>
+                        <Card>
+                            <CardContent>
+                                <Typography variant={"headline"} gutterBottom>
+                                    Details:
+                                </Typography>
+
+                                <Typography color="textPrimary" gutterBottom>
+                                    ID: <span className={'text-secondary'}>{this.props.data.id}</span>
+                                </Typography>
+
+                                <Typography color="textPrimary" gutterBottom>
+                                    Status: <span className={'text-secondary'}>{this.props.data.status}</span>
+                                </Typography>
+
+                                <Typography color="textPrimary" gutterBottom>
+                                    Date Submitted: <span className={'text-secondary'}><Moment
+                                    format="DD/MM/YYYY">{this.props.data.dateSubmitted}</Moment></span>
+                                </Typography>
+
+                                <hr/>
+
+                                <div>
+                                    <Typography variant={"headline"} gutterBottom>
+                                        Description:
                                     </Typography>
+
+                                    <Typography variant={"body1"}>{this.props.data.description}</Typography>
                                 </div>
 
-                                <Button onClick={this.close} color={"default"} style={{color: '#fff'}}>
-                                    Close
-                                </Button>
-                            </Toolbar>
-                        </AppBar>
+                                <hr/>
 
-                        <Paper elevation={1}>
-                            <Card>
-                                <CardContent>
+                                <div>
                                     <Typography variant={"headline"} gutterBottom>
-                                        Details:
+                                        Evidence:
                                     </Typography>
 
-                                    <Typography color="textPrimary" gutterBottom>
-                                        ID: <span className={'text-secondary'}>{this.props.data.id}</span>
-                                    </Typography>
+                                    {this.getEvidenceFiles()}
 
-                                    <Typography color="textPrimary" gutterBottom>
-                                        Status: <span className={'text-secondary'}>{this.props.data.status}</span>
-                                    </Typography>
+                                </div>
 
-                                    <Typography color="textPrimary" gutterBottom>
-                                        Date Submitted: <span className={'text-secondary'}><Moment
-                                        format="DD/MM/YYYY">{this.props.data.dateSubmitted}</Moment></span>
-                                    </Typography>
+                            </CardContent>
 
-                                    <hr/>
-
-                                    <div>
-                                        <Typography variant={"headline"} gutterBottom>
-                                            Description:
-                                        </Typography>
-
-                                        <Typography variant={"body1"}>{this.props.data.description}</Typography>
-                                    </div>
-
-                                    <hr/>
-
-                                    <List>
-                                        <ListItem>
-                                            <Avatar>
-                                                <FontAwesomeIcon icon={"file"}/>
-                                            </Avatar>
-                                            <ListItemText primary="Photos" secondary="Jan 9, 2014"/>
-                                        </ListItem>
-
-                                        <ListItem>
-                                            <Avatar>
-                                                <FontAwesomeIcon icon={"file"}/>
-                                            </Avatar>
-                                            <ListItemText primary="Work" secondary="Jan 7, 2014"/>
-                                        </ListItem>
-
-                                        <ListItem>
-                                            <Avatar>
-                                                <FontAwesomeIcon icon={"file"}/>
-                                            </Avatar>
-                                            <ListItemText primary="Vacation" secondary="July 20, 2014"/>
-                                        </ListItem>
-                                    </List>
-
-                                </CardContent>
-
-                                <CardActions>
-                                    <Button onClick={() => this.props.editRequest({status: "Approved"})} variant={'contained'} color="secondary" className={'mr-3'}>Approve</Button>
-                                    <Button onClick={() => this.props.editRequest({status: "Archived"})} variant={"contained"} color="primary" className={'mr-3'}>Archive</Button>
-                                </CardActions>
-                            </Card>
-                        </Paper>
+                            <CardActions>
+                                {this.props.user.isAdmin ? this.getAdminActions() : this.getStudentActions()}
+                            </CardActions>
 
 
-                    </DialogContent>
-                </Dialog>
-            </div>
-        );
+                            <SwipeableDrawer
+                                anchor="bottom"
+                                open={this.state.draws.denyDrawIsOpen}
+                                onClose={this.toggleDrawer('denyDrawIsOpen', false)}
+                                onOpen={this.toggleDrawer('denyDrawIsOpen', true)}>
+
+                                <div
+                                    tabIndex={0}
+                                    role="button"
+                                    onClick={this.toggleDrawer('denyDrawIsOpen', false)}
+                                    onKeyDown={this.toggleDrawer('denyDrawIsOpen', false)}>
+                                </div>
+
+                                <div className={'pt-5 pb-5 pl-2 pr-2'}>
+
+                                    <Typography variant={"headline"} color="primary" gutterBottom>Mark As
+                                        Denied</Typography>
+
+                                    <TextField
+                                        id="outlined-full-width"
+                                        label="Reason to Deny"
+                                        required
+                                        style={{marginBottom: 20}}
+                                        placeholder="E.g. The student no longer requires an extension."
+                                        helperText="Pleas ensure you are clear and concise as this will be sent to the student as well as other staff."
+                                        fullWidth
+                                        multiline
+                                        rowsMax="4"
+                                        value={this.state.reasonToDeny}
+                                        onChange={this.handleChange('reasonToDeny')}
+                                        margin="normal"
+                                        variant="outlined"
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                    />
+
+                                    <Button
+                                        onClick={this.markAsDenied}
+                                        variant={"outlined"}
+                                        disabled={this.state.reasonToDeny.length <= 0}
+                                        color="primary">Submit</Button>
+
+                                </div>
+
+                            </SwipeableDrawer>
+
+                        </Card>
+                    </Paper>
+
+
+                </DialogContent>
+            </Dialog>
+        </div>
     }
 }
 
 ViewRequestDialog.propTypes = {
-    data: PropTypes.object,
+    data: PropTypes.object.isRequired,
     open: PropTypes.bool,
     onClose: PropTypes.func
 };
 
-export default connect(null, mapDispatchToProps)(withStyles(styles)(ViewRequestDialog));
+export default compose(
+    connect(mapStateToProps, mapDispatchToProps),
+    withStyles(styles),
+    withRouter
+)(ViewRequestDialog)

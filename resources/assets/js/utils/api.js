@@ -1,8 +1,8 @@
+import axios from 'axios';
 
-const API_URL = "https://mctapi-218813.appspot.com";
+const API_URL = "https://api.rhysstubbs.services";
 
 const HEADERS = {
-    "Context-Type": "application/json",
     "Accept":	"application/json"
 };
 
@@ -11,7 +11,5 @@ const CONFIG = {
 };
 
 export {
-    API_URL,
-    HEADERS,
-    CONFIG
+  API_URL
 };

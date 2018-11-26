@@ -1,1 +1,4 @@
-API_URL = "https://mctapi-218813.appspot.com"
+API_URL = "https://api.rhysstubbs.services"
+
+
+

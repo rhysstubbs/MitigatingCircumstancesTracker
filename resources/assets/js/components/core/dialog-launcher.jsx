@@ -21,13 +21,23 @@ class DialogLauncher extends React.Component {
     render() {
         const Dialog = this.props.dialog;
 
+        const Icon = this.props.buttonIcon;
+
         return (
             <div>
-                <Button className={this.props.className} disableRipple={true} disableFocusRipple={true} onClick={this.toggle} size={this.props.size} variant={this.props.variant} color={this.props.color}>
+                <Button className={this.props.className}
+                        disableRipple={true}
+                        disableFocusRipple={true}
+                        onClick={this.toggle}
+                        size={this.props.size}
+                        variant={this.props.variant}
+                        color={this.props.color}>
+                    {typeof Icon !== 'undefined' ? <Icon/> : null}
                     {this.props.buttonText}
                 </Button>
 
-                <Dialog  data={this.props.dialogData} open={this.state.open} onClose={this.toggle}/>
+                {this.state.open ?
+                    <Dialog data={this.props.dialogData} open={this.state.open} onClose={this.toggle}/> : null}
             </div>
         );
     }

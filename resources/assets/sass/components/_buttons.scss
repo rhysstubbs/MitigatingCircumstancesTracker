@@ -12,3 +12,11 @@
   }
 
 }
+
+button {
+  &:focus-within,
+  &:focus,
+  &:active {
+    box-shadow: none !important;
+  }
+}

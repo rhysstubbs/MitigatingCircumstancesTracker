@@ -17,7 +17,7 @@ app.secret_key = 'lU\x80P\x11N\xbc\x8c\xc6*g\xdb,\xcdjw\xb8<E\xab5\x7f\xc5H'
 
 appengine.monkeypatch()
 
-SESSION_EXPIRE = 1
+SESSION_EXPIRE = 1000
 
 
 @app.before_request
@@ -79,7 +79,7 @@ def load_user_data(username, is_admin):
     url = API_URL
 
     if not is_admin:
-        url += ("/request?userId=%s" % username)
+        url += ("/request/foruser/%s" % username)
     else:
         url += "/request"
 

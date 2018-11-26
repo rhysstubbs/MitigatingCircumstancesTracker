@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import Table from 'MCT/components/core/table';
 import {requestColumns} from "MCT/fixtures/requests";
+import Typography from '@material-ui/core/Typography';
 
 const mapStateToProps = state => {
     return {
@@ -19,7 +20,7 @@ class RequestList extends React.Component {
 
     getColumnsForUser = (columns) => {
         if (this.props.isAdmin) {
-            return columns;
+            return columns.filter((col) => !col.hasOwnProperty('isAdmin') || col.isAdmin === true);
         } else {
 
             return columns.filter((col) => !col.hasOwnProperty('isAdmin') || col.isAdmin === false);
@@ -29,12 +30,29 @@ class RequestList extends React.Component {
     render() {
         return (
             <div>
-                <h2>Your Submitted Requests</h2>
+                <Typography variant="title" color="inherit" noWrap className={'mb-5'}>
+                    {this.props.isAdmin ? "Submitted Requests" : "Your Submitted Requests"}
+                </Typography>
 
-                <hr/>
-
-                <Table data={this.props.requests.filter(r => r.status !== "Archived")}
-                       columns={this.getColumnsForUser(requestColumns)}/>
+                <Table data={this.props.isAdmin ? this.props.requests : this.props.requests.filter(r => r.status !== 'Archived')}
+                       columns={this.getColumnsForUser(requestColumns)}
+                       defaultSorted={[
+                           {
+                               id: "dateSubmitted",
+                               desc: true
+                           },
+                           {
+                               id: "status",
+                               desc: true
+                           }
+                       ]}
+                       filterable={this.props.isAdmin}
+                       showPagination={this.props.requests.length >= 15}
+                       className="-striped -highlight"
+                       noDataText="No Requests to show at this time"
+                       defaultFilterMethod={(filter, row) => {
+                           return row["status"].toLowerCase() === filter.value;
+                       }}/>
             </div>
         );
     }
@@ -42,7 +60,7 @@ class RequestList extends React.Component {
 
 
 RequestList.defaultProps = {
-  requests: []
+    requests: []
 };
 
 RequestList.propTypes = {

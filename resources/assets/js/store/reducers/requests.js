@@ -1,4 +1,4 @@
-import {ADD_REQUEST, EDIT_REQUEST, DELETED_REQUEST, ARCHIVE_REQUEST} from '../action-types/requests';
+import {ADD_REQUEST, DELETED_REQUEST, MARK_REQUEST_AS} from '../action-types/requests';
 
 const requests = (state = null, action) => {
     if (!!action.type) {
@@ -7,16 +7,20 @@ const requests = (state = null, action) => {
             case ADD_REQUEST:
                 return [...state, action.payload];
 
-            case ARCHIVE_REQUEST:
-                return state;
+            case MARK_REQUEST_AS:
 
-            case EDIT_REQUEST:
-                return state;
+                return state.map((request) => {
+
+                    if (request.id === action.payload.requestId) {
+
+                        request.status = action.payload.status.toPascalCase();
+                        return request;
+                    }
+
+                    return request;
+                });
 
             case DELETED_REQUEST:
-
-                console.log("DELETING", true, action.payload);
-
                 return state.filter(request => {
                     return request.id !== action.payload
                 });

@@ -3,10 +3,14 @@ import Select from 'react-select';
 import Dropzone from 'react-dropzone'
 import {library} from '@fortawesome/fontawesome-svg-core'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-
+import TextField from '@material-ui/core/TextField';
+import {withStyles} from '@material-ui/core/styles';
+import {compose} from "recompose";
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import {connect} from 'react-redux';
 import {postRequest} from "MCT/store/action-creators/requests";
-
+import Checkbox from '@material-ui/core/Checkbox';
 import {
     Row,
     Col,
@@ -14,7 +18,6 @@ import {
     ListGroupItem,
     Button,
     Form,
-    FormGroup,
     Label,
     Input,
     FormText,
@@ -29,8 +32,20 @@ import {
     faFileAlt,
     faFileImage
 } from '@fortawesome/free-solid-svg-icons';
+import Slide from '@material-ui/core/Slide';
 
 import {faFileUpload, faInfoCircle, faGraduationCap, faTimes} from '@fortawesome/free-solid-svg-icons';
+import Loader from "MCT/components/core/loader";
+import Typography from "@material-ui/core/Typography/Typography";
+import {withRouter} from "react-router-dom";
+import Stepper from '@material-ui/core/Stepper';
+import Step from '@material-ui/core/Step';
+import StepLabel from '@material-ui/core/StepLabel';
+import StepContent from '@material-ui/core/StepContent';
+import Dialog from "@material-ui/core/Dialog/Dialog";
+import DialogContent from "@material-ui/core/DialogContent/DialogContent";
+import Toolbar from "@material-ui/core/Toolbar/Toolbar";
+import AppBar from "@material-ui/core/AppBar/AppBar";
 
 library.add(faFileUpload, faInfoCircle, faGraduationCap, faTimes);
 library.add(faFileWord, faFilePdf, faFilePowerpoint, faFileAudio, faFileAlt, faFileImage);
@@ -41,25 +56,90 @@ const IconFileExtensionMappings = {
     png: "file-image"
 };
 
+const reasons = [
+    {
+        value: 0,
+        label: "Illness"
+    },
+    {
+        value: 1,
+        label: "Family Illness"
+    },
+    {
+        value: 2,
+        label: "Pregnancy related illness"
+    },
+    {
+        value: 3,
+        label: "Unforeseen travel disruption"
+    },
+    {
+        value: 4,
+        label: "Acute Personal difficulties"
+    },
+    {
+        value: 'other',
+        label: "Other"
+    }
+];
+
+
 const mapDispatchToProps = {
     postRequest
 };
+
+const mapStateToProps = state => {
+    return {
+        user: state.user
+    }
+};
+
+const styles = theme => ({
+    container: {
+        display: 'flex',
+        flexWrap: 'wrap',
+    },
+    textField: {
+        width: 200,
+    },
+    root: {
+        width: '90%',
+    },
+    button: {
+        marginTop: theme.spacing.unit,
+        marginRight: theme.spacing.unit,
+    },
+    actionsContainer: {
+        marginBottom: theme.spacing.unit * 2,
+    },
+    resetContainer: {
+        padding: theme.spacing.unit * 3,
+    },
+});
+
+function Transition(props) {
+    return <Slide direction="up" {...props} />;
+}
 
 class SubmitRequestView extends React.Component {
 
     constructor(props) {
         super(props);
 
+        this.form = React.createRef();
+
         this.state = {
-            formValues: {
-                description: "",
-                files: [],
-                selectedSubjects: [],
-            },
+            activeStep: 0,
+            description: null,
+            files: [],
+            selectedSubjects: [],
             declinedFiles: [],
             formErrors: [],
             fileUploadErrors: [],
-            showErrors: false
+            showErrors: false,
+            loading: false,
+            extension: false,
+            reason: null
         };
     }
 
@@ -86,21 +166,35 @@ class SubmitRequestView extends React.Component {
 
     submit = (event) => {
 
+        this.setState({
+            loading: true
+        });
+
         event.preventDefault();
 
         let request = {
-            description: this.state.description
+            owner: this.props.user.username,
+            description: this.state.description,
+            files: this.state.files
         };
 
+        this.props.postRequest(request)
+            .then(response => {
 
-        this.props.postRequest(request).then(() => {
-            this.props.history.push('/requests');
-        });
+                this.setState({
+                    loading: false
+                });
+
+                return response;
+            })
+            .then(response => {
+                this.props.history.push('/requests');
+            });
     };
 
     removeFile = (fileName) => {
 
-        let currentFiles = this.state.formValues.files;
+        let currentFiles = this.state.files;
 
         if (currentFiles) {
 
@@ -113,9 +207,7 @@ class SubmitRequestView extends React.Component {
             });
 
             this.setState({
-                formValues: {
-                    files: currentFiles
-                }
+                files: currentFiles
             })
         }
     };
@@ -126,9 +218,13 @@ class SubmitRequestView extends React.Component {
         });
     };
 
+    handleCheckChange = name => event => {
+        this.setState({[name]: event.target.checked});
+    };
+
     onDrop(accepted, declined) {
 
-        let existingFiles = this.state.formValues.files;
+        let existingFiles = this.state.files;
         let fileUploadErrors = [];
 
         if (accepted) {
@@ -153,9 +249,7 @@ class SubmitRequestView extends React.Component {
             });
 
             this.setState({
-                formValues: {
-                    files: existingFiles
-                }
+                files: existingFiles
             });
 
         } else if (declined) {
@@ -169,21 +263,37 @@ class SubmitRequestView extends React.Component {
         });
     }
 
-    render() {
-        return (
-            <Row>
-                <Col>
-                    <h2>Submit a new request for mitigating circumstances</h2>
-                    <hr/>
-                    <Form className={'mt-5'} onSubmit={this.submit}>
+    getSteps = () => {
+        return ['General Details', 'Create an ad group', 'Evidence', 'Sign and Submit'];
+    };
 
-                        <FormGroup>
+    getStepContent = (step) => {
+        switch (step) {
+            case 0:
+                return (
+                    <div>
+                        <FormGroup row={false} className={'mb-3'}>
+
                             <Label for="description">
                                 <i className={'mr-2'}>
                                     <FontAwesomeIcon icon={'info-circle'} color={'#CCCCCC'}/>
                                 </i>
                                 Provide details:
                             </Label>
+
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={this.state.extension}
+                                        onChange={this.handleCheckChange('extension')}
+                                        value='extension'
+                                    />
+                                }
+                                label="Is this a assignment extension request?"
+                            />
+                        </FormGroup>
+
+                        <FormGroup row={false} className={'mb-3'}>
                             <Input type="textarea"
                                    name="description"
                                    id="description"
@@ -194,13 +304,16 @@ class SubmitRequestView extends React.Component {
                             />
                         </FormGroup>
 
-                        <FormGroup>
+                        <FormGroup row={false} className={'mb-3'}>
+
                             <Label>
                                 <i className={'mr-2'}>
                                     <FontAwesomeIcon icon={'graduation-cap'} color={'#CCCCCC'}/>
                                 </i>
                                 Which subject(s) does this affect?
                             </Label>
+
+
                             <Select
                                 value={this.state.subjects}
                                 onChange={this.handleChange}
@@ -209,10 +322,77 @@ class SubmitRequestView extends React.Component {
                             />
                         </FormGroup>
 
+                        <Label for="description">
+                            <i className={'mr-2'}>
+                                <FontAwesomeIcon icon={'info-circle'} color={'#CCCCCC'}/>
+                            </i>
+                            Reason:
+                        </Label>
+
+
+                        <FormGroup className={'mb-3'}>
+                            <Select
+                                value={this.state.reason}
+                                onChange={this.handleChange}
+                                options={reasons}
+                                isMulti={true}
+                            />
+                        </FormGroup>
+                    </div>
+                );
+            case 1:
+                return (
+                    <div>
+                        <FormGroup row={false} className={'mb-3'}>
+
+                            <Typography variant={"headline"} gutterBottom>
+                                Exceptional Circumstances Details
+                            </Typography>
+
+                            <Label>{"Date the Circumstance started"}</Label>
+
+                            <TextField
+                                id="date"
+                                label="Date started"
+                                type="date"
+                                required={true}
+                                className={styles.textField}
+                                fullWidth={false}
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                                onChange={this.handleChange}
+                                name={'dateStarted'}
+                            />
+                        </FormGroup>
+
+                        <FormGroup row={false} className={'mb-3'}>
+
+                            <Label>{"Date the Circumstance Ended"}</Label>
+
+                            <TextField
+                                id="date"
+                                label="Date end"
+                                type="date"
+                                required={true}
+                                className={styles.textField}
+                                onChange={this.handleChange}
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                            />
+
+                        </FormGroup>
+                    </div>
+                );
+            case 2:
+                return (
+                    <div>
                         <FormGroup>
-                            <Label for="evidence"><i className={'mr-2'}><FontAwesomeIcon icon="file-upload"
-                                                                                         color={'#CCCCCC'}/></i>Supporting
-                                Evidence</Label>
+                            <Label for="evidence">
+                                <i className={'mr-2'}>
+                                    <FontAwesomeIcon icon="file-upload" color={'#CCCCCC'}/>
+                                </i>Supporting Evidence</Label>
                             <div>
 
                                 <div>
@@ -246,11 +426,11 @@ class SubmitRequestView extends React.Component {
                                     </Dropzone>
                                 </div>
                                 <aside>
-                                    {this.state.formValues.files.length > 0 ?
+                                    {this.state.files.length > 0 ?
                                         <h6 className={'mt-3'}>Dropped files</h6> : null}
 
                                     <ListGroup>
-                                        {this.state.formValues.files.map((file) =>
+                                        {this.state.files.map((file) =>
                                             <ListGroupItem key={file.name}
                                                            style={{position: "relative"}}>
                                                 <i className={'mr-2'}>{SubmitRequestView.getIconForFileType(file.name)}</i> {file.name}
@@ -271,14 +451,78 @@ class SubmitRequestView extends React.Component {
                                 </aside>
                             </div>
                         </FormGroup>
+                    </div>
+                );
+            default:
+                return 'Unknown step';
+        }
+    };
 
-                        <Button color="primary" size={'lg'} type={'submit'}>Submit for Review</Button>
-                        <FormText>All information provide is confidential.</FormText>
-                    </Form>
-                </Col>
-            </Row>
+    handleNext = () => {
+        this.setState(state => ({
+            activeStep: state.activeStep + 1,
+        }));
+    };
+
+    handleBack = () => {
+        this.setState(state => ({
+            activeStep: state.activeStep - 1,
+        }));
+    };
+
+    handleReset = () => {
+        this.setState({
+            activeStep: 0,
+        });
+    };
+
+    render() {
+
+        const {classes} = this.props;
+        const steps = this.getSteps();
+        const {activeStep} = this.state;
+
+        return (
+            <Form className={styles.container} onSubmit={this.submit}>
+
+                <Stepper activeStep={activeStep} orientation="vertical">
+                    {steps.map((label, index) => {
+                        return (
+                            <Step key={label}>
+                                <StepLabel>{label}</StepLabel>
+                                <StepContent>
+                                    <Typography>{this.getStepContent(index)}</Typography>
+                                    <div className={classes.actionsContainer}>
+                                        <div>
+                                            <Button
+                                                disabled={activeStep === 0}
+                                                onClick={this.handleBack}
+                                                className={classes.button}>
+                                                Back
+                                            </Button>
+                                            <Button
+                                                variant="contained"
+                                                color="primary"
+                                                onClick={activeStep === steps.length - 1 ? this.submit : this.handleNext}
+                                                className={classes.button}>
+                                                {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </StepContent>
+                            </Step>
+                        );
+                    })}
+
+                    <Loader isLoading={this.state.loading} fullScreen={true}/>
+
+                </Stepper>
+            </Form>
         );
     }
 }
 
-export default connect(null, mapDispatchToProps)(SubmitRequestView);
+export default compose(
+    connect(mapStateToProps, mapDispatchToProps),
+    withStyles(styles),
+)(SubmitRequestView)

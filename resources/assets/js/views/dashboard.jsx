@@ -29,7 +29,7 @@ class Dashboard extends React.Component {
                         }}
                         options={{
                             username: 'bournemouthuni',
-                            height: '260'
+                            height: '400'
                         }}
                     />
                 </div>

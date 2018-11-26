@@ -1,41 +1,87 @@
 import Moment from "react-moment";
-import StoreButton from "MCT/components/core/store-button";
 import DialogLauncher from "MCT/components/core/dialog-launcher";
 import ViewRequestDialog from "MCT/components/dialogs/view-request-dialog";
 import React from "react";
 
-import { deleteRequest } from "MCT/store/action-creators/requests";
+import requestStatus from 'MCT/constants/request-status';
+
+import OpenIcon from '@material-ui/icons/OpenInBrowser';
 
 export const requestColumns = [
     {
         Header: 'ID',
-        accessor: 'id'
+        accessor: 'id',
+        type: 'custom',
+        isAdmin: false,
+        Cell: (row) => {
+
+            return (
+                <DialogLauncher className={"btn-mini"}
+                                dialog={ViewRequestDialog}
+                                dialogData={row.original}
+                                buttonIcon={OpenIcon}
+                                buttonText={row.original.id}
+                                color="secondary"
+                                size="small"/>
+            )
+
+        }
     },
     {
         Header: "Status",
         accessor: "status",
-        Cell: row => {
+        type: 'custom',
+        Cell: (row) => {
 
-            const status = row.original.status;
             let color = "";
 
-            if (status === "Submitted") {
-                color = "#85cc00"
+            if (row.original.status === "Submitted") {
+                color = "#57b25d";
+            }
+
+            if (row.original.status === "Archived") {
+                color = "#4286f4";
+            }
+
+            if (row.original.status === "Approved") {
+                color = "#f44168";
             }
 
             return (
-                <p style={{color: color}} className={'m-0 p-0'}>{status}</p>
+                <p style={{color: color}} className={'m-0 p-0'}>{row.original.status}</p>
+            )
+        },
+        filterMethod: (filter, row) => {
+
+            if (filter.value === "submitted") {
+                return true;
+            }
+
+            return row["status"].toLowerCase() === filter.value.toLowerCase();
+        },
+        Filter: ({filter, onChange}) => {
+            return (
+                <select
+                    onChange={event => onChange(event.target.value)}
+                    style={{width: "100%"}}
+                    value={filter ? filter.value : "submitted"}>
+
+                    <option value={"all"}>Show All</option>
+
+                    {requestStatus.map(status => {
+                        return (
+                            <option value={status} key={status}>{status.toPascalCase()}</option>
+                        );
+                    })}
+                </select>
             )
         }
     },
     {
         Header: "Date Submitted",
         accessor: "dateSubmitted",
-        Cell: (row) => {
-            return (
-                <Moment format="DD/MM/YYYY @ hh:mm">{row.original.dateSubmitted}</Moment>
-            )
-        }
+        type: 'custom',
+        Cell: (row) => <Moment format="D/MM/YYYY">{row.original.dateSubmitted}</Moment>
     },
     {
         Header: 'Description',
@@ -43,25 +89,11 @@ export const requestColumns = [
     },
     {
         Header: '',
-        type: 'store-button',
-        className: 'action',
-        isAdmin: false,
-        headerClassName: 'action',
-        Cell: (row) => {
-            return (
-                <StoreButton
-                    buttonText={'Cancel'}
-                    onClick={deleteRequest}
-                />
-            )
-        }
-    },
-    {
-        Header: '',
         type: 'custom',
         className: 'action',
         isAdmin: true,
         headerClassName: 'action',
+        Filter: () => {},
         Cell: (row) => {
             return (
                 <DialogLauncher className={"btn-mini outlined-primary"}
@@ -73,5 +105,5 @@ export const requestColumns = [
                                 size="small"/>
             );
         }
-    },
+    }
 ];
