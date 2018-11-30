@@ -51,15 +51,15 @@ npm run prod
 
 ### And coding style tests
 
-The project uses ESlint for code styling tracking, specifically the React reccomended defaults. This is the typical output to expect:
-```bash
+The project uses ESlint for code styling tracking, specifically the React recommended defaults. This is the typical output to expect:
+```
 ERROR in ./resources/assets/js/views/view-all.jsx
 // ...
 22:24  error  'isAdmin' is missing in props validation  react/prop-types
 ✖ 1 problem (1 error, 0 warnings)
 ```
 
-Build Analysis is available by using the following command
+Build Analysis is available by using the following command and navigating to [http://127.0.0.1:8888/](http://127.0.0.1:8888/)
 ```bash
 npm run analysis
 ```
