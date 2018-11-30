@@ -17,7 +17,7 @@ import Avatar from '@material-ui/core/Avatar';
 import ListItem from '@material-ui/core/ListItem';
 import TextField from '@material-ui/core/TextField';
 import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
-import {withRouter, Link} from 'react-router-dom';
+import {withRouter} from 'react-router-dom';
 import {compose} from "recompose";
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
@@ -25,10 +25,9 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Moment from 'react-moment';
 import DeleteIcon from '@material-ui/icons/Delete';
 import IconButton from '@material-ui/core/IconButton';
-
+import Tooltip from '@material-ui/core/Tooltip';
 import DownloadIcon from '@material-ui/icons/CloudDownload';
 import FileIcon from '@material-ui/icons/FileCopy';
-
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faTimes, faFile} from '@fortawesome/free-solid-svg-icons';
 import {markRequestAs} from "MCT/store/action-creators/requests";
@@ -202,7 +201,7 @@ class ViewRequestDialog extends React.Component {
         });
     };
 
-    markAsDenied = (event) => {
+    markAsDenied = () => {
 
         this.setState({
             loading: true
@@ -222,6 +221,7 @@ class ViewRequestDialog extends React.Component {
                         position: toast.POSITION.TOP_RIGHT
                     }
                 )
+                return response;
             })
             .then((response) => {
 
@@ -229,7 +229,7 @@ class ViewRequestDialog extends React.Component {
 
                 return response;
             })
-            .then(response => this.close());
+            .then(() => this.close());
     };
 
     markAs = (status) => {
@@ -258,7 +258,7 @@ class ViewRequestDialog extends React.Component {
 
                 return response;
             })
-            .then(response => this.close());
+            .then(() => this.close());
 
     };
 
@@ -280,13 +280,17 @@ class ViewRequestDialog extends React.Component {
                                 </ListItemAvatar>
                                 <ListItemText primary={file.name.toLowerCase()}/>
                                 <ListItemSecondaryAction>
-                                    <IconButton aria-label="Delete">
-                                        <DeleteIcon/>
-                                    </IconButton>
-                                    <a href={file.link}>
-                                        <IconButton aria-label="Download">
-                                            <DownloadIcon/>
+                                    <Tooltip title="Coming Soon!">
+                                        <IconButton aria-label="Delete">
+                                            <DeleteIcon/>
                                         </IconButton>
+                                    </Tooltip>
+                                    <a href={file.link}>
+                                        <Tooltip title="Download the file">
+                                            <IconButton aria-label="Download">
+                                                <DownloadIcon/>
+                                            </IconButton>
+                                        </Tooltip>
                                     </a>
 
                                 </ListItemSecondaryAction>
@@ -303,7 +307,9 @@ class ViewRequestDialog extends React.Component {
 
     getStudentActions = () => {
         return (
-            <div></div>
+            <React.Fragment>
+
+            </React.Fragment>
         )
     };
 
@@ -338,7 +344,12 @@ class ViewRequestDialog extends React.Component {
             );
         }
 
-        return actions.map((action) => action);
+        return (
+            <React.Fragment>
+                {actions.map((action) => action)}
+            </React.Fragment>
+        )
+
     };
 
     handleChange = name => event => {
@@ -352,143 +363,147 @@ class ViewRequestDialog extends React.Component {
     };
 
     render() {
-        return <div>
-            <Dialog fullScreen={true}
-                    open={this.props.open}
-                    TransitionComponent={Transition}
-                    onClose={this.props.onClose}
-                    onExited={() => this.setState(this.initialState)}>
+        return (
+            <React.Fragment>
+                <Dialog fullScreen={true}
+                        open={this.props.open}
+                        TransitionComponent={Transition}
+                        onClose={this.props.onClose}
+                        onExited={() => this.setState(this.initialState)}>
 
-                <Loader isLoading={this.state.loading} fullScreen={true}/>
+                    <Loader isLoading={this.state.loading} fullScreen={true}/>
 
-                <DialogContent style={{paddingTop: 80}}>
-                    <AppBar>
-                        <Toolbar>
-                            <div style={{display: 'flex', flexGrow: 1}}>
-                                <Typography variant="title" color="inherit" noWrap className={'mr-5'}>
-                                    {`Request`}
-                                </Typography>
-                            </div>
+                    <DialogContent style={{paddingTop: 80}}>
+                        <AppBar>
+                            <Toolbar>
+                                <div style={{display: 'flex', flexGrow: 1}}>
+                                    <Typography variant="title" color="inherit" noWrap className={'mr-5'}>
+                                        {`Request`}
+                                    </Typography>
+                                </div>
 
-                            <Button onClick={this.close} color={"default"} style={{color: '#fff'}}>
-                                Close
-                            </Button>
-                        </Toolbar>
-                    </AppBar>
+                                <Button onClick={this.close} color={"default"} style={{color: '#fff'}}>
+                                    Close
+                                </Button>
+                            </Toolbar>
+                        </AppBar>
 
-                    <Paper elevation={1}>
-                        <Card>
-                            <CardContent>
-                                <Typography variant={"headline"} gutterBottom>
-                                    Details:
-                                </Typography>
-
-                                <Typography color="textPrimary" gutterBottom>
-                                    ID: <span className={'text-secondary'}>{this.props.data.id}</span>
-                                </Typography>
-
-                                <Typography color="textPrimary" gutterBottom>
-                                    Status: <span className={'text-secondary'}>{this.props.data.status}</span>
-                                </Typography>
-
-                                <Typography color="textPrimary" gutterBottom>
-                                    Date Submitted: <span className={'text-secondary'}><Moment
-                                    format="DD/MM/YYYY">{this.props.data.dateSubmitted}</Moment></span>
-                                </Typography>
-
-                                <hr/>
-
-                                <div>
+                        <Paper elevation={1}>
+                            <Card>
+                                <CardContent>
                                     <Typography variant={"headline"} gutterBottom>
-                                        Description:
+                                        Details:
                                     </Typography>
 
-                                    <Typography variant={"body1"}>{this.props.data.description}</Typography>
-                                </div>
-
-                                <hr/>
-
-                                <div>
-                                    <Typography variant={"headline"} gutterBottom>
-                                        Evidence:
+                                    <Typography color="textPrimary" gutterBottom>
+                                        ID: <span className={'text-secondary'}>{this.props.data.id}</span>
                                     </Typography>
 
-                                    {this.getEvidenceFiles()}
+                                    <Typography color="textPrimary" gutterBottom>
+                                        Status: <span className={'text-secondary'}>{this.props.data.status}</span>
+                                    </Typography>
 
-                                </div>
+                                    <Typography color="textPrimary" gutterBottom>
+                                        Date Submitted: <span className={'text-secondary'}><Moment
+                                        format="DD/MM/YYYY">{this.props.data.dateSubmitted}</Moment></span>
+                                    </Typography>
 
-                            </CardContent>
+                                    <hr/>
 
-                            <CardActions>
-                                {this.props.user.isAdmin ? this.getAdminActions() : this.getStudentActions()}
-                            </CardActions>
+                                    <div>
+                                        <Typography variant={"headline"} gutterBottom>
+                                            Description:
+                                        </Typography>
 
+                                        <Typography variant={"body1"}>{this.props.data.description}</Typography>
+                                    </div>
 
-                            <SwipeableDrawer
-                                anchor="bottom"
-                                open={this.state.draws.denyDrawIsOpen}
-                                onClose={this.toggleDrawer('denyDrawIsOpen', false)}
-                                onOpen={this.toggleDrawer('denyDrawIsOpen', true)}>
+                                    <hr/>
 
-                                <div
-                                    tabIndex={0}
-                                    role="button"
-                                    onClick={this.toggleDrawer('denyDrawIsOpen', false)}
-                                    onKeyDown={this.toggleDrawer('denyDrawIsOpen', false)}>
-                                </div>
+                                    <div>
+                                        <Typography variant={"headline"} gutterBottom>
+                                            Evidence:
+                                        </Typography>
 
-                                <div className={'pt-5 pb-5 pl-2 pr-2'}>
+                                        {this.getEvidenceFiles()}
 
-                                    <Typography variant={"headline"} color="primary" gutterBottom>Mark As
-                                        Denied</Typography>
+                                    </div>
 
-                                    <TextField
-                                        id="outlined-full-width"
-                                        label="Reason to Deny"
-                                        required
-                                        style={{marginBottom: 20}}
-                                        placeholder="E.g. The student no longer requires an extension."
-                                        helperText="Pleas ensure you are clear and concise as this will be sent to the student as well as other staff."
-                                        fullWidth
-                                        multiline
-                                        rowsMax="4"
-                                        value={this.state.reasonToDeny}
-                                        onChange={this.handleChange('reasonToDeny')}
-                                        margin="normal"
-                                        variant="outlined"
-                                        InputLabelProps={{
-                                            shrink: true,
-                                        }}
-                                    />
+                                </CardContent>
 
-                                    <Button
-                                        onClick={this.markAsDenied}
-                                        variant={"outlined"}
-                                        disabled={this.state.reasonToDeny.length <= 0}
-                                        color="primary">Submit</Button>
-
-                                </div>
-
-                            </SwipeableDrawer>
-
-                        </Card>
-                    </Paper>
+                                <CardActions>
+                                    {this.props.user.isAdmin ? this.getAdminActions() : this.getStudentActions()}
+                                </CardActions>
 
 
-                </DialogContent>
-            </Dialog>
-        </div>
+                                <SwipeableDrawer
+                                    anchor="bottom"
+                                    open={this.state.draws.denyDrawIsOpen}
+                                    onClose={this.toggleDrawer('denyDrawIsOpen', false)}
+                                    onOpen={this.toggleDrawer('denyDrawIsOpen', true)}>
+
+                                    <div
+                                        tabIndex={0}
+                                        role="button"
+                                        onClick={this.toggleDrawer('denyDrawIsOpen', false)}
+                                        onKeyDown={this.toggleDrawer('denyDrawIsOpen', false)}>
+                                    </div>
+
+                                    <div className={'pt-5 pb-5 pl-2 pr-2'}>
+
+                                        <Typography variant={"headline"} color="primary" gutterBottom>Mark As
+                                            Denied</Typography>
+
+                                        <TextField
+                                            id="outlined-full-width"
+                                            label="Reason to Deny"
+                                            required
+                                            style={{marginBottom: 20}}
+                                            placeholder="E.g. The student no longer requires an extension."
+                                            helperText="Pleas ensure you are clear and concise as this will be sent to the student as well as other staff."
+                                            fullWidth
+                                            multiline
+                                            rowsMax="4"
+                                            value={this.state.reasonToDeny}
+                                            onChange={this.handleChange('reasonToDeny')}
+                                            margin="normal"
+                                            variant="outlined"
+                                            InputLabelProps={{
+                                                shrink: true,
+                                            }}
+                                        />
+
+                                        <Button
+                                            onClick={this.markAsDenied}
+                                            variant={"outlined"}
+                                            disabled={this.state.reasonToDeny.length <= 0}
+                                            color="primary">Submit</Button>
+
+                                    </div>
+
+                                </SwipeableDrawer>
+
+                            </Card>
+                        </Paper>
+
+
+                    </DialogContent>
+                </Dialog>
+            </React.Fragment>
+        )
     }
 }
 
 ViewRequestDialog.propTypes = {
     data: PropTypes.object.isRequired,
+    markRequestAs: PropTypes.func,
     open: PropTypes.bool,
-    onClose: PropTypes.func
+    onClose: PropTypes.func,
+    user: PropTypes.object
 };
 
 export default compose(
     connect(mapStateToProps, mapDispatchToProps),
     withStyles(styles),
     withRouter
-)(ViewRequestDialog)
+)(ViewRequestDialog);

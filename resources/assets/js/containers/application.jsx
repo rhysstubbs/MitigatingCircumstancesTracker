@@ -6,7 +6,7 @@ import {Provider} from 'react-redux';
 import configureStore from 'MCT/store/index';
 import {Container, Row, Col} from 'reactstrap';
 import Header from 'MCT/views/global/header';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 
 const initialState = window.app;
 
@@ -21,7 +21,7 @@ class Application extends React.Component {
 
     render() {
         return (
-            <div>
+            <React.Fragment>
                 <Header/>
 
                 <Container fluid={true}>
@@ -36,7 +36,7 @@ class Application extends React.Component {
 
                 <ToastContainer hideProgressBar={true} autoClose={8000} />
 
-            </div>
+            </React.Fragment>
         );
     }
 }

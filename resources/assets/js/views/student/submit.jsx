@@ -11,16 +11,26 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import {connect} from 'react-redux';
 import {postRequest} from "MCT/store/action-creators/requests";
 import Checkbox from '@material-ui/core/Checkbox';
+import Loader from "MCT/components/core/loader";
+import Typography from "@material-ui/core/Typography/Typography";
+import Stepper from '@material-ui/core/Stepper';
+import Step from '@material-ui/core/Step';
+import StepLabel from '@material-ui/core/StepLabel';
+import StepContent from '@material-ui/core/StepContent';
+import reasons from 'MCT/fixtures/mct-reasons';
+import {faFileUpload, faInfoCircle, faGraduationCap, faTimes} from '@fortawesome/free-solid-svg-icons';
+import {isObjectEmpty} from "MCT/utils/helpers";
+import PropTypes from 'prop-types';
+
+library.add(faFileUpload, faInfoCircle, faGraduationCap, faTimes);
+library.add(faFileWord, faFilePdf, faFilePowerpoint, faFileAudio, faFileAlt, faFileImage);
+
 import {
-    Row,
-    Col,
     ListGroup,
     ListGroupItem,
     Button,
-    Form,
     Label,
     Input,
-    FormText,
     Alert
 } from 'reactstrap';
 
@@ -32,57 +42,12 @@ import {
     faFileAlt,
     faFileImage
 } from '@fortawesome/free-solid-svg-icons';
-import Slide from '@material-ui/core/Slide';
-
-import {faFileUpload, faInfoCircle, faGraduationCap, faTimes} from '@fortawesome/free-solid-svg-icons';
-import Loader from "MCT/components/core/loader";
-import Typography from "@material-ui/core/Typography/Typography";
-import {withRouter} from "react-router-dom";
-import Stepper from '@material-ui/core/Stepper';
-import Step from '@material-ui/core/Step';
-import StepLabel from '@material-ui/core/StepLabel';
-import StepContent from '@material-ui/core/StepContent';
-import Dialog from "@material-ui/core/Dialog/Dialog";
-import DialogContent from "@material-ui/core/DialogContent/DialogContent";
-import Toolbar from "@material-ui/core/Toolbar/Toolbar";
-import AppBar from "@material-ui/core/AppBar/AppBar";
-
-library.add(faFileUpload, faInfoCircle, faGraduationCap, faTimes);
-library.add(faFileWord, faFilePdf, faFilePowerpoint, faFileAudio, faFileAlt, faFileImage);
 
 const IconFileExtensionMappings = {
     pdf: "file-pdf",
     docx: "file-word",
     png: "file-image"
 };
-
-const reasons = [
-    {
-        value: 0,
-        label: "Illness"
-    },
-    {
-        value: 1,
-        label: "Family Illness"
-    },
-    {
-        value: 2,
-        label: "Pregnancy related illness"
-    },
-    {
-        value: 3,
-        label: "Unforeseen travel disruption"
-    },
-    {
-        value: 4,
-        label: "Acute Personal difficulties"
-    },
-    {
-        value: 'other',
-        label: "Other"
-    }
-];
-
 
 const mapDispatchToProps = {
     postRequest
@@ -117,29 +82,30 @@ const styles = theme => ({
     },
 });
 
-function Transition(props) {
-    return <Slide direction="up" {...props} />;
-}
-
 class SubmitRequestView extends React.Component {
 
     constructor(props) {
         super(props);
 
-        this.form = React.createRef();
-
         this.state = {
             activeStep: 0,
-            description: null,
-            files: [],
-            selectedSubjects: [],
             declinedFiles: [],
             formErrors: [],
             fileUploadErrors: [],
-            showErrors: false,
             loading: false,
+            showOther: false,
+
+            /** payload data */
+            description: "",
             extension: false,
-            reason: null
+            reason: {},
+            reasonOther: "",
+            agreementSigned: false,
+            dateStarted: "",
+            dateEnded: "",
+            onGoing: false,
+            subjects: [],
+            files: []
         };
     }
 
@@ -162,24 +128,29 @@ class SubmitRequestView extends React.Component {
         }
 
         return fn.pop().toLowerCase();
-    };
+    }
 
-    submit = (event) => {
+    submit = () => {
 
-        this.setState({
+        /**this.setState({
             loading: true
-        });
+        });*/
 
-        event.preventDefault();
-
-        let request = {
+        const request = {
             owner: this.props.user.username,
+            extension: this.state.extension,
             description: this.state.description,
+            reason: isObjectEmpty(this.state.reason) ?  this.state.reasonOther : this.state.reason.value,
+            agreementSigned: this.state.agreementSigned,
+            dateStarted: this.state.dateStarted,
+            dataEnded: this.state.dateEnded,
+            onGoing: this.state.onGoing,
+            selectedSubjects: this.state.subjects,
             files: this.state.files
         };
 
         this.props.postRequest(request)
-            .then(response => {
+         .then(response => {
 
                 this.setState({
                     loading: false
@@ -187,7 +158,7 @@ class SubmitRequestView extends React.Component {
 
                 return response;
             })
-            .then(response => {
+         .then(() => {
                 this.props.history.push('/requests');
             });
     };
@@ -215,6 +186,26 @@ class SubmitRequestView extends React.Component {
     handleChange = (event) => {
         this.setState({
             [event.target.name]: event.target.value
+        });
+    };
+
+    handleSubjectChange = (selectedOptions) => {
+        this.setState({
+            subjects: selectedOptions
+        });
+    };
+
+    handleReasonChange = (selectedOption) => {
+
+        if (selectedOption.value === 'Other') {
+
+            this.setState({
+                showOther: true
+            });
+        }
+
+        this.setState({
+            reason: selectedOption
         });
     };
 
@@ -264,23 +255,18 @@ class SubmitRequestView extends React.Component {
     }
 
     getSteps = () => {
-        return ['General Details', 'Create an ad group', 'Evidence', 'Sign and Submit'];
+        return ['General Details', 'Tell Us When', 'Evidence', 'Sign and Submit'];
     };
 
     getStepContent = (step) => {
         switch (step) {
             case 0:
                 return (
-                    <div>
+                    <React.Fragment>
+                        <Typography gutterBottom={true}
+                                    variant={"h6"}>{"Please complete all sections and provide as much detail as possible."}</Typography>
+
                         <FormGroup row={false} className={'mb-3'}>
-
-                            <Label for="description">
-                                <i className={'mr-2'}>
-                                    <FontAwesomeIcon icon={'info-circle'} color={'#CCCCCC'}/>
-                                </i>
-                                Provide details:
-                            </Label>
-
                             <FormControlLabel
                                 control={
                                     <Checkbox
@@ -289,7 +275,7 @@ class SubmitRequestView extends React.Component {
                                         value='extension'
                                     />
                                 }
-                                label="Is this a assignment extension request?"
+                                label="Is this an assignment extension request?"
                             />
                         </FormGroup>
 
@@ -301,6 +287,7 @@ class SubmitRequestView extends React.Component {
                                    onChange={this.handleChange}
                                    value={this.state.description}
                                    placeholder="Description"
+                                   invalid={this.state.description === ""}
                             />
                         </FormGroup>
 
@@ -313,10 +300,9 @@ class SubmitRequestView extends React.Component {
                                 Which subject(s) does this affect?
                             </Label>
 
-
                             <Select
                                 value={this.state.subjects}
-                                onChange={this.handleChange}
+                                onChange={this.handleSubjectChange}
                                 options={[]}
                                 isMulti={true}
                             />
@@ -329,20 +315,33 @@ class SubmitRequestView extends React.Component {
                             Reason:
                         </Label>
 
-
                         <FormGroup className={'mb-3'}>
                             <Select
+                                name={'reason'}
                                 value={this.state.reason}
-                                onChange={this.handleChange}
+                                onChange={this.handleReasonChange}
                                 options={reasons}
-                                isMulti={true}
+
                             />
                         </FormGroup>
-                    </div>
+
+                        <FormGroup row={false} className={this.state.showOther ? 'mb-3' : 'd-none'}>
+                            <Input type="textarea"
+                                   name="reasonOther"
+                                   id="reasonOther"
+                                   rows={4}
+                                   onChange={this.handleChange}
+                                   value={this.state.reasonOther}
+                                   placeholder="Please explain..."
+                                   invalid={this.state.showOther && this.state.reasonOther === ""}
+                            />
+                        </FormGroup>
+
+                    </React.Fragment>
                 );
             case 1:
                 return (
-                    <div>
+                    <React.Fragment>
                         <FormGroup row={false} className={'mb-3'}>
 
                             <Typography variant={"headline"} gutterBottom>
@@ -370,34 +369,55 @@ class SubmitRequestView extends React.Component {
 
                             <Label>{"Date the Circumstance Ended"}</Label>
 
-                            <TextField
-                                id="date"
-                                label="Date end"
-                                type="date"
-                                required={true}
-                                className={styles.textField}
-                                onChange={this.handleChange}
-                                InputLabelProps={{
-                                    shrink: true,
-                                }}
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={this.state.onGoing}
+                                        onChange={this.handleCheckChange('onGoing')}
+                                        value='onGoing'
+                                    />
+                                }
+                                label="Is this on-going?"
                             />
 
+                            <div className={this.state.onGoing ? 'd-none' : ''}>
+
+                                <TextField
+                                    id="date"
+                                    label="Date end"
+                                    type="date"
+                                    required={true}
+                                    className={styles.textField}
+                                    fullWidth={false}
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                    onChange={this.handleChange}
+                                    name={'dateEnded'}
+                                />
+                            </div>
+
                         </FormGroup>
-                    </div>
+
+                    </React.Fragment>
                 );
             case 2:
                 return (
-                    <div>
+                    <React.Fragment>
+
+                        <Typography gutterBottom={true}
+                                    variant={"h6"}>{"Please upload any files that you feel will aid your case."}</Typography>
+
                         <FormGroup>
                             <Label for="evidence">
                                 <i className={'mr-2'}>
                                     <FontAwesomeIcon icon="file-upload" color={'#CCCCCC'}/>
-                                </i>Supporting Evidence</Label>
+                                </i>Ensure files are no more than 25MB in size.</Label>
                             <div>
 
                                 <div>
                                     {this.state.fileUploadErrors.map((error) =>
-                                        <Alert color="danger">
+                                        <Alert key={Math.random()} color="danger">
                                             {error}
                                         </Alert>
                                     )}
@@ -451,7 +471,68 @@ class SubmitRequestView extends React.Component {
                                 </aside>
                             </div>
                         </FormGroup>
-                    </div>
+                    </React.Fragment>
+                );
+            case 3:
+                return (
+                    <React.Fragment>
+                        <Typography gutterBottom={true}
+                                    variant={"h6"}>{"By signing and dating below you are confirming that you have read and understood the following:"}</Typography>
+
+                        <ul className={'mt-3'}>
+                            <li>The University enters into communications with students in good faith and expects the
+                                same from our
+                                students in return. Any false declaration, fraudulent evidence received and/or
+                                dishonesty is taken
+                                extremely seriously by the University and could result in disciplinary action (under
+                                11K-Student
+                                Disciplinary Procedure) and in very serious instances, may lead to expulsion from the
+                                University.
+                            </li>
+                            <li>
+                                The University reserves the right to check the authenticity of any submitted documents
+                                and evidence.
+                            </li>
+                            <li>
+                                All documentation submitted to us will be handled in accordance with the relevant BU
+                                Data Protection
+                                Policy.
+                            </li>
+                            <li>
+                                Any evidence provided that contains the personal data of a third party is received by
+                                the University
+                                on
+                                the understanding that the student submitting this has gained approval from the third
+                                party for
+                                submitting
+                                this and for the University to handle and process this in line with the relevant BU Data
+                                Protection
+                                Policy.
+                            </li>
+                        </ul>
+
+                        <p>
+                            I declare that the information given in this form and the accompanying evidence is, to the
+                            best of my
+                            knowledge, true and complete. I will be willing to answer further questions relating to the
+                            statements
+                            and/or the evidence that I have provided.
+                        </p>
+
+                        <FormGroup row>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={this.state.agreementSigned}
+                                        onChange={this.handleCheckChange('agreementSigned')}
+                                        value='agreementSigned'
+                                    />
+                                }
+                                label="I Agree."
+                            />
+                        </FormGroup>
+
+                    </React.Fragment>
                 );
             default:
                 return 'Unknown step';
@@ -470,20 +551,39 @@ class SubmitRequestView extends React.Component {
         }));
     };
 
-    handleReset = () => {
-        this.setState({
-            activeStep: 0,
-        });
-    };
-
     render() {
 
         const {classes} = this.props;
         const steps = this.getSteps();
-        const {activeStep} = this.state;
+        const {activeStep, loading} = this.state;
 
         return (
-            <Form className={styles.container} onSubmit={this.submit}>
+            <React.Fragment>
+                <Typography gutterBottom={true} variant={"h6"}>{"Request for Extension or Postponement"}</Typography>
+
+                <small>
+                    Please use this form if you are reporting circumstances prior to the hand-in date or examination
+                    date.
+
+                    If you have a short term sickness (up to 5 calendar days) before the hand-in date or examination
+                    date please ensure you contact your programme team to notify them of short-term sickness. You must
+                    contact them at least one hour before the submission time/ examination start time. You will then be
+                    provided with the completed Self-certification form to submit as evidence.
+
+                    If you are reporting Circumstances after the hand-in date or examination date please refer to the
+                    ‘Assessment Board Consideration’ request form.
+
+                    Please refer to 6J- Exceptional Circumstances including Extensions: Policy and Procedures when
+                    completing this form.
+
+                    If this document is not in an accessible format to you, please email
+                    academicquality@bournemouth.ac.uk or contact askBU and we will endeavour to supply the information
+                    in a more suitable format.
+
+                    Confidentiality: We appreciate that your circumstances may be of a personal or sensitive nature. The
+                    information provided in this form and all evidence submitted in support will be handled in
+                    accordance with the relevant BU Data Protection Policy.
+                </small>
 
                 <Stepper activeStep={activeStep} orientation="vertical">
                     {steps.map((label, index) => {
@@ -491,7 +591,7 @@ class SubmitRequestView extends React.Component {
                             <Step key={label}>
                                 <StepLabel>{label}</StepLabel>
                                 <StepContent>
-                                    <Typography>{this.getStepContent(index)}</Typography>
+                                    {this.getStepContent(index)}
                                     <div className={classes.actionsContainer}>
                                         <div>
                                             <Button
@@ -514,15 +614,21 @@ class SubmitRequestView extends React.Component {
                         );
                     })}
 
-                    <Loader isLoading={this.state.loading} fullScreen={true}/>
-
+                    <Loader isLoading={loading} fullScreen={true}/>
                 </Stepper>
-            </Form>
+            </React.Fragment>
         );
     }
 }
 
+SubmitRequestView.propTypes = {
+    history: PropTypes.object.isRequired,
+    postRequest: PropTypes.func.isRequired,
+    classes: PropTypes.object,
+    user: PropTypes.object
+};
+
 export default compose(
     connect(mapStateToProps, mapDispatchToProps),
     withStyles(styles),
-)(SubmitRequestView)
+)(SubmitRequestView);

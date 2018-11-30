@@ -29,7 +29,7 @@ class RequestList extends React.Component {
 
     render() {
         return (
-            <div>
+            <React.Fragment>
                 <Typography variant="title" color="inherit" noWrap className={'mb-5'}>
                     {this.props.isAdmin ? "Submitted Requests" : "Your Submitted Requests"}
                 </Typography>
@@ -53,13 +53,14 @@ class RequestList extends React.Component {
                        defaultFilterMethod={(filter, row) => {
                            return row["status"].toLowerCase() === filter.value;
                        }}/>
-            </div>
+            </React.Fragment>
         );
     }
 }
 
 
 RequestList.defaultProps = {
+    isAdmin: false,
     requests: []
 };
 

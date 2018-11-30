@@ -1,6 +1,6 @@
-import {OK, NO_CONTENT} from 'http-status-codes';
+import {OK} from 'http-status-codes';
 import axios from 'axios';
-import {addingRequest, addRequest, addRequestError, markRequest} from 'MCT/store/actions/index';
+import {addRequest, addRequestError, markRequest} from 'MCT/store/actions/index';
 
 import {API_URL} from "MCT/utils/api";
 
@@ -55,9 +55,9 @@ const postRequest = (payload) => {
 
                     case OK:
 
-                        const requestId = response.data.id;
+                        if (files && files.length > 0) {
 
-                        if (payload.files && payload.files.length > 0) {
+                            const requestId = response.data.id;
 
                             return postFiles(requestId, payload.files)
                                 .then((uploadResponse) => {

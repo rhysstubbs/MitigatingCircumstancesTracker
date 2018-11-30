@@ -1,6 +1,7 @@
 import React from "react";
 import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
+import PropTypes from 'prop-types';
 
 const mapStateToProps = state => {
     return {
@@ -39,7 +40,7 @@ class Header extends React.Component {
 
     render() {
         return (
-            <div>
+            <React.Fragment>
                 <header className={'mb-5'}>
                     <div className="row">
                         <div className="col-24">
@@ -65,9 +66,13 @@ class Header extends React.Component {
                         </div>
                     </div>
                 </header>
-            </div>
+            </React.Fragment>
         );
     }
 }
+
+Header.propTypes = {
+  user: PropTypes.object
+};
 
 export default connect(mapStateToProps)(Header);

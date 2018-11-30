@@ -4,9 +4,11 @@ threadsafe: true
 
 # [START handlers]
 handlers:
+
 - url: /public
   static_dir: public
   secure: always
+
 - url: /.*
   script: main.app
   secure: always
@@ -14,6 +16,7 @@ handlers:
 
 # [START libraries]
 libraries:
+
 - name: ssl
   version: latest
 # [END libraries]

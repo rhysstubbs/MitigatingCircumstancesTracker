@@ -2,7 +2,6 @@ import {
     ADD_REQUEST,
     ADDING_REQUEST,
     ADDING_REQUEST_ERROR,
-    DELETED_REQUEST,
     MARK_REQUEST_AS
 } from "MCT/store/action-types/requests";
 

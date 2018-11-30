@@ -1,7 +1,7 @@
 import {ADD_REQUEST, DELETED_REQUEST, MARK_REQUEST_AS} from '../action-types/requests';
 
 const requests = (state = null, action) => {
-    if (!!action.type) {
+    if (action.type) {
         switch (action.type) {
 
             case ADD_REQUEST:

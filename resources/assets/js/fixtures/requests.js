@@ -93,6 +93,7 @@ export const requestColumns = [
         className: 'action',
         isAdmin: true,
         headerClassName: 'action',
+        sortable: false,
         Filter: () => {},
         Cell: (row) => {
             return (

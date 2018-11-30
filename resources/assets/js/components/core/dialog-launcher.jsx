@@ -16,7 +16,7 @@ class DialogLauncher extends React.Component {
 
     toggle() {
         this.setState({open: !this.state.open})
-    };
+    }
 
     render() {
         const Dialog = this.props.dialog;
@@ -45,7 +45,17 @@ class DialogLauncher extends React.Component {
 }
 
 DialogLauncher.propTypes = {
-    dialogData: PropTypes.object
+    dialogData: PropTypes.object,
+    buttonText: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.number
+    ]),
+    color: PropTypes.string,
+    variant: PropTypes.string,
+    className: PropTypes.string,
+    dialog: PropTypes.func,
+    size: PropTypes.string,
+    buttonIcon: PropTypes.func
 };
 
 export default DialogLauncher;

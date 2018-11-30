@@ -17,7 +17,7 @@ class Dashboard extends React.Component {
 
     render() {
         return (
-            <div>
+            <React.Fragment>
                 <h4>Welcome back, {this.props.username} </h4>
 
                 <div className={'mt-5'}>
@@ -33,7 +33,7 @@ class Dashboard extends React.Component {
                         }}
                     />
                 </div>
-            </div>
+            </React.Fragment>
         )
     }
 

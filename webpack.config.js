@@ -8,6 +8,7 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const WebpackBuildNotifierPlugin = require('webpack-build-notifier');
 const WebpackChunkHashPlugin = require('webpack-chunk-hash');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const assetPath = '../';
 const production = (process.env.NODE_ENV === 'production' || process.argv.includes('-p'));
@@ -165,18 +166,23 @@ module.exports = {
             {
                 test: /\.(js|jsx)$/,
                 exclude: /(node_modules|bower_components)/,
-                use: {
-                    loader: 'babel-loader',
-                    options: {
-                        presets: [
-                            '@babel/preset-env',
-                            '@babel/react'
-                        ],
-                        plugins: [
-                            "@babel/plugin-proposal-class-properties"
-                        ]
+                use: [
+                    {
+                        loader: 'babel-loader',
+                        options: {
+                            presets: [
+                                '@babel/preset-env',
+                                '@babel/react'
+                            ],
+                            plugins: [
+                                "@babel/plugin-proposal-class-properties"
+                            ]
+                        }
+                    },
+                    {
+                        loader: 'eslint-loader'
                     }
-                }
+                ]
             }
         ],
     },
@@ -189,26 +195,28 @@ module.exports = {
             compilationSuccessInfo: {},
             shouldClearConsole: true
         }),
-        new webpack[production ? 'HashedModuleIdsPlugin': 'NamedModulesPlugin'](),
+        new webpack[production ? 'HashedModuleIdsPlugin' : 'NamedModulesPlugin'](),
         new WebpackChunkHashPlugin(),
+        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+        !production ? new BundleAnalyzerPlugin() : () => {},
         new webpack.LoaderOptionsPlugin({
             minimize: production
         }),
         new ManifestPlugin({
             fileName: 'mix-manifest.json',
-            map: function(asset) {
+            map: function (asset) {
                 if (!!asset.name && asset.name.indexOf('?') > -1) {
                     asset.name = asset.name.substr(0, asset.name.indexOf('?'));
                 }
                 return asset;
             },
-            filter: function(asset) {
+            filter: function (asset) {
                 return /sprite\.svg/.test(asset.name) || (asset.isInitial && !/\.map$/.test(asset.name));
             }
         }),
         new WebpackBuildNotifierPlugin({
             title: "MitigatingCircumstancesTracker",
-            successIcon:  path.resolve(__dirname, 'resources/assets/images/build-icons/success.png'),
+            successIcon: path.resolve(__dirname, 'resources/assets/images/build-icons/success.png'),
             warningIcon: path.resolve(__dirname, 'resources/assets/images/build-icons/warning.png'),
             failureIcon: path.resolve(__dirname, 'resources/assets/images/build-icons/failure.png')
         })
@@ -217,20 +225,22 @@ module.exports = {
         minimize: production,
         minimizer: [
             new UglifyJsPlugin({
-                sourceMap: true,
+                sourceMap: !production,
                 uglifyOptions: {
                     ie8: false,
                     ecma: 6,
                     compress: {
-                        warnings: false,
-                        drop_console: true
+                        warnings: production,
+                        drop_console: production
                     },
                     output: {
-                        comments: false
+                        comments: !production
                     }
                 }
             }),
-            new OptimizeCSSAssetsPlugin({})
+            new OptimizeCSSAssetsPlugin({
+                sourceMap: !production
+            })
         ],
         splitChunks: {
             cacheGroups: {
@@ -249,7 +259,7 @@ module.exports = {
         }
     },
     resolve: {
-        extensions: [ '*', '.js', '.jsx' ],
+        extensions: ['*', '.js', '.jsx'],
         alias: {
             "./icons": path.resolve('./resources/assets/images/build-icons'),
             "MCT": path.resolve('./resources/assets/js'),

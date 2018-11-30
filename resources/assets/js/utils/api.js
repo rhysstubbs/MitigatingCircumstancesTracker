@@ -1,15 +1,13 @@
-import axios from 'axios';
-
 const API_URL = "https://api.rhysstubbs.services";
 
 const HEADERS = {
-    "Accept":	"application/json"
+    "Accept": "application/json"
 };
 
-const CONFIG = {
-
-};
+const CONFIG = {};
 
 export {
-  API_URL
+    API_URL,
+    HEADERS,
+    CONFIG
 };
