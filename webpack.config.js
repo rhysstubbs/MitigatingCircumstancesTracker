@@ -12,9 +12,10 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 
 const assetPath = '../';
 const production = (process.env.NODE_ENV === 'production' || process.argv.includes('-p'));
+const runAnalysis = (process.env.NODE_ENV !== 'production' && process.argv.includes('-a'));
 
 module.exports = {
-    mode: production ? 'production' : 'development',
+    mode: (production ? 'production' : 'development'),
     context: path.resolve(__dirname),
     entry: {
         '/js/app': [
@@ -198,7 +199,7 @@ module.exports = {
         new webpack[production ? 'HashedModuleIdsPlugin' : 'NamedModulesPlugin'](),
         new WebpackChunkHashPlugin(),
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-        !production ? new BundleAnalyzerPlugin() : () => {},
+        runAnalysis ? new BundleAnalyzerPlugin() : () => {},
         new webpack.LoaderOptionsPlugin({
             minimize: production
         }),
@@ -289,11 +290,5 @@ module.exports = {
         reasons: false,
         source: false,
         publicPath: false
-    },
-    devServer: {
-        contentBase: path.join(__dirname, 'public'),
-        historyApiFallback: true,
-        compress: true,
-        port: 9000,
     }
 };

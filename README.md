@@ -59,6 +59,11 @@ ERROR in ./resources/assets/js/views/view-all.jsx
 ✖ 1 problem (1 error, 0 warnings)
 ```
 
+Build Analysis is available by using the following command
+```bash
+npm run analysis
+```
+
 ## Deployment
 
 Deployment is managed via Google Cloud Util, the following command can be used to deploy the application:
