@@ -15,7 +15,6 @@ const styles = {
     backgroundColor: "rgba(130, 130, 130, 0.5)"
 };
 
-
 class Loader extends React.Component {
 
     constructor(props) {

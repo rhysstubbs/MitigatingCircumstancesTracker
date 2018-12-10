@@ -220,7 +220,7 @@ class ViewRequestDialog extends React.Component {
                     {
                         position: toast.POSITION.TOP_RIGHT
                     }
-                )
+                );
                 return response;
             })
             .then((response) => {
@@ -286,7 +286,7 @@ class ViewRequestDialog extends React.Component {
                                         </IconButton>
                                     </Tooltip>
                                     <a href={file.link}>
-                                        <Tooltip title="Download the file">
+                                        <Tooltip title="Download">
                                             <IconButton aria-label="Download">
                                                 <DownloadIcon/>
                                             </IconButton>
@@ -407,6 +407,21 @@ class ViewRequestDialog extends React.Component {
                                         Date Submitted: <span className={'text-secondary'}><Moment
                                         format="DD/MM/YYYY">{this.props.data.dateSubmitted}</Moment></span>
                                     </Typography>
+
+                                    <hr/>
+
+                                    <Typography color={"textPrimary"} gutterBottom>
+                                        Date the issue started: <span className={'text-secondary'}><Moment
+                                        format="DD/MM/YYYY">{this.props.data.dateStarted}</Moment></span>
+                                    </Typography>
+
+                                    {this.props.data.onGoing ?
+                                        <Typography gutterBottom>Date the issue stopped: <span className={'text-secondary'}>This is an on-going problem.</span></Typography> :
+                                        <Typography gutterBottom>Date the issue stopped: <span className={'text-secondary'}><Moment
+                                            format="DD/MM/YYYY">{this.props.data.dateEnded}</Moment></span></Typography>
+                                    }
+
+                                    <Typography gutterBottom>Generel Reason: <span className={"text-secondary"}>{this.props.data.reason}</span></Typography>
 
                                     <hr/>
 

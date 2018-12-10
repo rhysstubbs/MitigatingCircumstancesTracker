@@ -6,7 +6,8 @@ import {Provider} from 'react-redux';
 import configureStore from 'MCT/store/index';
 import {Container, Row, Col} from 'reactstrap';
 import Header from 'MCT/views/global/header';
-import { ToastContainer } from 'react-toastify';
+import {ToastContainer} from 'react-toastify';
+import Footer from "MCT/views/global/footer";
 
 const initialState = window.app;
 
@@ -22,20 +23,23 @@ class Application extends React.Component {
     render() {
         return (
             <React.Fragment>
-                <Header/>
+                <div className={'main'}>
 
-                <Container fluid={true}>
-                    <Row>
-                        <Col>
-                            <Routes isAdmin={initialState.user.isAdmin}/>
-                        </Col>
-                    </Row>
-                </Container>
+                    <Header/>
 
-                {/** Global Components */}
+                    <Container fluid={true}>
+                        <Row>
+                            <Col>
+                                <Routes isAdmin={initialState.user.isAdmin}/>
+                            </Col>
+                        </Row>
+                    </Container>
 
-                <ToastContainer hideProgressBar={true} autoClose={8000} />
+                    {/** Global Components */}
 
+                    <ToastContainer hideProgressBar={true} autoClose={8000}/>
+                </div>
+                <Footer/>
             </React.Fragment>
         );
     }

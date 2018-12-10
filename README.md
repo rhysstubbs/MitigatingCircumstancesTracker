@@ -10,7 +10,7 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 
-* Python 2.7 and Pip
+* Python 2.7 and Pip (with VirtualEnv configured)
 * Google App Engine Standard (Python 2.7 Runtime)
 * NPM (Node Package Manager)
 
@@ -22,7 +22,7 @@ Say what the step will be
 
 1 - Install the project dependencies
 ```bash
-pip install -t lib requirements.txt
+pip install -t lib -r requirements.txt
 ```
 
 2 - Install Javascript dependencies (see package.json for details)
@@ -35,7 +35,7 @@ npm install
 Development Build
 
 ```bash
-npm run watch
+npm run watch [-r for analysis]
 ```
 
 Staging Build
@@ -69,6 +69,11 @@ npm run analysis
 Deployment is managed via Google Cloud Util, the following command can be used to deploy the application:
 ```bash
 gcloud app deploy app.yaml
+```
+
+To stream console output, use:
+```bash
+gcloud app logs tail -s default
 ```
 
 ## Built With

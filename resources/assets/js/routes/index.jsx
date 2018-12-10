@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import RequestList from 'MCT/views/view-all';
 import CaseSubmit from 'MCT/views/student/submit';
 import Dashboard from 'MCT/views/dashboard';
+import MyAccount from 'MCT/views/student/account';
 
 class Routes extends React.Component {
 
@@ -14,7 +15,7 @@ class Routes extends React.Component {
     static getAdminRoutes() {
         return (
             <Switch>
-                <Route exact path={"/"} component={Dashboard}/>
+                <Route exact path={"/dashboard"} component={Dashboard}/>
                 <Route exact path="/requests" component={RequestList}/>
             </Switch>
         )
@@ -23,9 +24,10 @@ class Routes extends React.Component {
     static getStudentRoutes() {
         return (
             <Switch>
-                <Route exact path={"/"} component={Dashboard}/>
+                <Route exact path={"/dashboard"} component={Dashboard}/>
                 <Route exact path="/requests" component={RequestList}/>
                 <Route exact path="/submit" component={CaseSubmit}/>
+                <Route exact path={"/account"} component={MyAccount} />
             </Switch>
         )
     }

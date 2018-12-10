@@ -40,10 +40,6 @@ class RequestList extends React.Component {
                            {
                                id: "dateSubmitted",
                                desc: true
-                           },
-                           {
-                               id: "status",
-                               desc: true
                            }
                        ]}
                        filterable={this.props.isAdmin}

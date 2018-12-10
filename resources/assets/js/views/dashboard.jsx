@@ -5,7 +5,7 @@ import {Timeline} from 'react-twitter-widgets';
 
 const mapStateToProps = state => {
     return {
-        username: state.user.username
+        name: state.user.name
     }
 };
 
@@ -18,7 +18,7 @@ class Dashboard extends React.Component {
     render() {
         return (
             <React.Fragment>
-                <h4>Welcome back, {this.props.username} </h4>
+                <h4>{this.props.name}, welcome back!</h4>
 
                 <div className={'mt-5'}>
                     <h5>Recent BU News</h5>
@@ -40,7 +40,7 @@ class Dashboard extends React.Component {
 }
 
 Dashboard.propTypes = {
-    username: PropTypes.string
+    name: PropTypes.string
 };
 
 export default connect(mapStateToProps)(Dashboard);

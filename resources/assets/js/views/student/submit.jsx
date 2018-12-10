@@ -104,7 +104,6 @@ class SubmitRequestView extends React.Component {
             dateStarted: "",
             dateEnded: "",
             onGoing: false,
-            subjects: [],
             files: []
         };
     }
@@ -132,9 +131,9 @@ class SubmitRequestView extends React.Component {
 
     submit = () => {
 
-        /**this.setState({
+        this.setState({
             loading: true
-        });*/
+        });
 
         const request = {
             owner: this.props.user.username,
@@ -143,9 +142,8 @@ class SubmitRequestView extends React.Component {
             reason: isObjectEmpty(this.state.reason) ?  this.state.reasonOther : this.state.reason.value,
             agreementSigned: this.state.agreementSigned,
             dateStarted: this.state.dateStarted,
-            dataEnded: this.state.dateEnded,
+            dateEnded: this.state.dateEnded,
             onGoing: this.state.onGoing,
-            selectedSubjects: this.state.subjects,
             files: this.state.files
         };
 
@@ -288,23 +286,6 @@ class SubmitRequestView extends React.Component {
                                    value={this.state.description}
                                    placeholder="Description"
                                    invalid={this.state.description === ""}
-                            />
-                        </FormGroup>
-
-                        <FormGroup row={false} className={'mb-3'}>
-
-                            <Label>
-                                <i className={'mr-2'}>
-                                    <FontAwesomeIcon icon={'graduation-cap'} color={'#CCCCCC'}/>
-                                </i>
-                                Which subject(s) does this affect?
-                            </Label>
-
-                            <Select
-                                value={this.state.subjects}
-                                onChange={this.handleSubjectChange}
-                                options={[]}
-                                isMulti={true}
                             />
                         </FormGroup>
 

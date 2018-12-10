@@ -2,51 +2,53 @@
 
 {% block body %}
 
-<div class="container">
-    <div class="row">
-        <div class="col">
-            <div id="form-signin">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <div id="form-signin">
 
-                <form class="validate" method="post" action="/login">
+                    <form id="login-form" class="validate" method="post" action="/login">
 
-                    <div class="form-group mb-5 d-flex justify-content-center">
-                        <img src="/public/assets/images/bu_logo.png" class="img-fluid">
-                    </div>
+                        <div class="form-group mb-5 d-flex justify-content-center">
+                            <img src="/public/assets/images/bu_logo.png" class="img-fluid">
+                        </div>
 
-                    {% with messages = get_flashed_messages() %}
-                    {% if messages %}
-                    <ul class="list-unstyled">
-                        {% for message in messages %}
-                        <li>
-                            <div class="alert alert-danger" role="alert">
-                                {{ message }}
-                            </div>
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                <ul class="list-unstyled">
+                                    {% for category, message in messages %}
+                                        <li>
+                                            <div class="alert alert-{{ category }}" role="alert">
+                                                {{ message }}
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        {% endwith %}
 
-                        </li>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
-                    {% endwith %}
+                        <div class="form-group">
+                            <label for="username">Username</label>
 
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input id="username" class="form-control" type="text" name="username" placeholder="i7433085"
-                               required="required"/>
-                    </div>
+                            <input id="username"
+                                   class="form-control"
+                                   name="username"
+                                   placeholder="i7433085"
+                                   required="required"/>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input id="password" class="form-control" type="password" name="password"
-                               placeholder="*********" required="required"/>
-                    </div>
+                        <div id="google-signin"></div>
+                        <input id="idToken" type="hidden" name="idToken"/>
 
-                    <button type="submit" class="btn btn-primary btn-block btn-md">Login</button>
-                    <!--a class="btn btn-block text-center btn-link btn-sm" href="#">Forgot Your Password?</a-->
-
-                </form>
+                        <div id="logged-in-extras" class="d-none">
+                            <button id="btn-continue" type="submit" class="btn btn-primary w-100" role="button">
+                                Continue as <span id="continue-name"></span></button>
+                            <button id="login-logout" class="btn-link btn-sm mt-2" style="margin: 0 auto; display: block; cursor: pointer;">Logout</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 {% endblock %}
