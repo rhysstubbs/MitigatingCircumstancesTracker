@@ -399,6 +399,10 @@ class ViewRequestDialog extends React.Component {
                                     </Typography>
 
                                     <Typography color="textPrimary" gutterBottom>
+                                        Student: <span className={'text-secondary'}>{this.props.data.owner.path[0].name}</span>
+                                    </Typography>
+
+                                    <Typography color="textPrimary" gutterBottom>
                                         Status: <span className={'text-secondary'}>{this.props.data.status}</span>
                                     </Typography>
 
