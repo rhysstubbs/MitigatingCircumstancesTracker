@@ -2,10 +2,12 @@ import Moment from "react-moment";
 import DialogLauncher from "MCT/components/core/dialog-launcher";
 import ViewRequestDialog from "MCT/components/dialogs/view-request-dialog";
 import React from "react";
-
 import requestStatus from 'MCT/constants/request-status';
-
 import OpenIcon from '@material-ui/icons/OpenInBrowser';
+import TextField from "@material-ui/core/TextField";
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
+import moment from 'moment';
 
 export const requestColumns = [
     {
@@ -53,17 +55,21 @@ export const requestColumns = [
         },
         filterMethod: (filter, row) => {
 
-            if (filter.value === "submitted") {
+            const ALL = 'all';
+
+            if (filter.value.toLowerCase() === ALL) {
                 return true;
             }
 
             return row["status"].toLowerCase() === filter.value.toLowerCase();
         },
         Filter: ({filter, onChange}) => {
+
+
             return (
                 <select
                     onChange={event => onChange(event.target.value)}
-                    style={{width: "100%"}}
+                    style={{width: "100%", height: "32px"}}
                     value={filter ? filter.value : "submitted"}>
 
                     <option value={"all"}>Show All</option>
@@ -81,7 +87,36 @@ export const requestColumns = [
         Header: "Date Submitted",
         accessor: "dateSubmitted",
         type: 'custom',
-        Cell: (row) => <Moment format="D/MM/YYYY">{row.original.dateSubmitted}</Moment>
+        Cell: (row) => (<Moment format="D/MM/YYYY">{row.original.dateSubmitted}</Moment>),
+        filterMethod: (filter, row) => {
+
+            filter.value.persist();
+            const filterValue = filter.value.currentTarget.value;
+
+            if (filterValue === "" || typeof filterValue === 'undefined' || !filterValue) {
+                return true;
+            }
+
+            let i = moment(row["dateSubmitted"], 'YYYY-MM-DD HH:mm:ss');
+            let j = moment(filterValue, 'YYYY-MM-DD HH:mm:ss');
+
+            return i.isAfter(j, 'day');
+        },
+        Filter: ({filter, onChange}) => {
+            return (
+                <TextField
+                    id="date"
+                    type="date"
+                    label="Show all submitted on/after date"
+                    fullWidth={true}
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                    onChange={onChange}
+                    name={'dateStarted'}
+                />
+            )
+        }
     },
     {
         Header: 'Description',
@@ -94,7 +129,8 @@ export const requestColumns = [
         isAdmin: true,
         headerClassName: 'action',
         sortable: false,
-        Filter: () => {},
+        Filter: () => {
+        },
         Cell: (row) => {
             return (
                 <DialogLauncher className={"btn-mini outlined-primary"}

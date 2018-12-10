@@ -34,21 +34,20 @@ class RequestList extends React.Component {
                     {this.props.isAdmin ? "Submitted Requests" : "Your Submitted Requests"}
                 </Typography>
 
-                <Table data={this.props.isAdmin ? this.props.requests : this.props.requests.filter(r => r.status !== 'Archived')}
-                       columns={this.getColumnsForUser(requestColumns)}
-                       defaultSorted={[
-                           {
-                               id: "dateSubmitted",
-                               desc: true
-                           }
-                       ]}
-                       filterable={this.props.isAdmin}
-                       showPagination={this.props.requests.length >= 15}
-                       className="-striped -highlight"
-                       noDataText="No Requests to show at this time"
-                       defaultFilterMethod={(filter, row) => {
-                           return row["status"].toLowerCase() === filter.value;
-                       }}/>
+                <Table
+                    data={this.props.isAdmin ? this.props.requests : this.props.requests.filter(r => r.status !== 'Archived')}
+                    columns={this.getColumnsForUser(requestColumns)}
+                    defaultSorted={[
+                        {
+                            id: "dateSubmitted",
+                            desc: true
+                        }
+                    ]}
+                    filterable={this.props.isAdmin}
+                    showPagination={this.props.requests.length >= 15}
+                    className="-striped -highlight"
+                    noDataText="No Request Submissions to show at this time"/>
+
             </React.Fragment>
         );
     }

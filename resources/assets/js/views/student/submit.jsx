@@ -187,12 +187,6 @@ class SubmitRequestView extends React.Component {
         });
     };
 
-    handleSubjectChange = (selectedOptions) => {
-        this.setState({
-            subjects: selectedOptions
-        });
-    };
-
     handleReasonChange = (selectedOption) => {
 
         if (selectedOption.value === 'Other') {
@@ -209,6 +203,18 @@ class SubmitRequestView extends React.Component {
 
     handleCheckChange = name => event => {
         this.setState({[name]: event.target.checked});
+    };
+
+    handleNext = () => {
+        this.setState(state => ({
+            activeStep: state.activeStep + 1,
+        }));
+    };
+
+    handleBack = () => {
+        this.setState(state => ({
+            activeStep: state.activeStep - 1,
+        }));
     };
 
     onDrop(accepted, declined) {
@@ -518,18 +524,6 @@ class SubmitRequestView extends React.Component {
             default:
                 return 'Unknown step';
         }
-    };
-
-    handleNext = () => {
-        this.setState(state => ({
-            activeStep: state.activeStep + 1,
-        }));
-    };
-
-    handleBack = () => {
-        this.setState(state => ({
-            activeStep: state.activeStep - 1,
-        }));
     };
 
     render() {

@@ -272,7 +272,7 @@ class ViewRequestDialog extends React.Component {
                 <List>
                     {files.map((file) => {
                         return (
-                            <ListItem key={`${file.name}_${Math.random()}`}>
+                            <ListItem key={file.name}>
                                 <ListItemAvatar>
                                     <Avatar>
                                         <FileIcon color={"action"}/>
@@ -292,7 +292,6 @@ class ViewRequestDialog extends React.Component {
                                             </IconButton>
                                         </Tooltip>
                                     </a>
-
                                 </ListItemSecondaryAction>
                             </ListItem>
                         )
