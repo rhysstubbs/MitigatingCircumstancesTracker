@@ -81,7 +81,7 @@ def login():
                 send_confirmation = requests.post(url)
 
                 if send_confirmation.status_code == OK:
-                    flash("We have emailed you a single-use link to confirm your account!", "success")
+                    flash("We have emailed you a single-use link to confirm your account!", 'success')
                 else:
                     flash("Oops, something went wrong?", "danger")
 
