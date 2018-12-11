@@ -93,9 +93,9 @@ We use [GitHub](https://github.com) for versioning. For the versions available, 
 ## Authors
 
 * **Rhys Stubbs**
-## License
+## Copyright
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+Copyright &copy; 2018 Rhys Stubbs. All rights reserved.
 
 ## Acknowledgments
 
