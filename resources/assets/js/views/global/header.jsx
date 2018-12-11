@@ -6,13 +6,21 @@ import Avatar from '@material-ui/core/Avatar';
 import Chip from '@material-ui/core/Chip';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import Tooltip from "@material-ui/core/Tooltip";
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import {withStyles} from '@material-ui/core/styles';
+import AccountBoxIcon from '@material-ui/icons/AccountBoxRounded';
+import LogoutIcon from '@material-ui/icons/CallMade';
+import {compose} from "recompose";
+import AccountDrawer from "MCT/components/drawers/account-drawer";
 
 const mapStateToProps = state => {
     return {
         user: state.user
     }
 };
+
+const styles = () => ({});
 
 class Header extends React.Component {
 
@@ -21,17 +29,9 @@ class Header extends React.Component {
 
         this.state = {
             anchorEl: null,
+            accountOpen: false
         };
     }
-
-    openMenu = event => {
-        this.setState({anchorEl: event.currentTarget});
-    };
-
-    handleClose = () => {
-        this.setState({anchorEl: null});
-    };
-
 
     static getAdminLinks() {
         return (
@@ -62,6 +62,18 @@ class Header extends React.Component {
         )
     }
 
+    toggleDrawer = () => {
+        this.setState({accountOpen: !this.state.accountOpen})
+    };
+
+    openMenu = event => {
+        this.setState({anchorEl: event.currentTarget});
+    };
+
+    handleClose = () => {
+        this.setState({anchorEl: null});
+    };
+
     logout = () => {
         window.signOut();
     };
@@ -69,6 +81,7 @@ class Header extends React.Component {
     render() {
 
         const {anchorEl} = this.state;
+        const {classes} = this.props;
 
         return (
             <React.Fragment>
@@ -105,20 +118,33 @@ class Header extends React.Component {
                                             anchorEl={anchorEl}
                                             open={Boolean(anchorEl)}
                                             onClose={this.handleClose}>
-                                            {!this.props.user.isAdmin ?
-                                                <Tooltip title="Coming Soon!">
-                                                    <MenuItem onClick={this.handleClose}>
-                                                        My Account
-                                                    </MenuItem>
-                                                </Tooltip> : null}
 
-                                            <MenuItem onClick={this.logout}>Logout</MenuItem>
+                                            {!this.props.user.isAdmin ?
+                                                <MenuItem className={classes.menuItem}
+                                                          onClick={this.toggleDrawer}>
+                                                    <ListItemIcon className={classes.icon}>
+                                                        <AccountBoxIcon/>
+                                                    </ListItemIcon>
+                                                    <ListItemText classes={{primary: classes.primary}} inset
+                                                                  primary="Account"/>
+                                                </MenuItem> : null}
+
+                                            <MenuItem className={classes.menuItem} onClick={this.logout}>
+                                                <ListItemIcon className={classes.icon}>
+                                                    <LogoutIcon/>
+                                                </ListItemIcon>
+                                                <ListItemText classes={{primary: classes.primary}} inset
+                                                              primary="Logout"/>
+                                            </MenuItem>
                                         </Menu>
                                     </div>
                                 </nav>
                             </div>
                         </div>
                     </div>
+
+                    <AccountDrawer open={this.state.accountOpen} onClose={this.toggleDrawer}/>
+
                 </header>
             </React.Fragment>
         );
@@ -126,7 +152,11 @@ class Header extends React.Component {
 }
 
 Header.propTypes = {
-    user: PropTypes.object
+    user: PropTypes.object,
+    classes: PropTypes.object.isRequired
 };
 
-export default connect(mapStateToProps)(Header);
+export default compose(
+    connect(mapStateToProps, null),
+    withStyles(styles),
+)(Header);

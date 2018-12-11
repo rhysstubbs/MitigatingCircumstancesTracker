@@ -16,17 +16,18 @@
       "modules": true
     }
   },
+  "rules": {
+    "no-console": "off"
+  },
   "settings": {
     "react": {
-      "createClass": "createReactClass", // Regex for Component Factory to use,
-                                         // default to "createReactClass"
-      "pragma": "React",  // Pragma to use, default to "React"
-      "version": "16.6.3", // React version, default to the latest React stable release
-      "flowVersion": "0.53" // Flow version
+      "createClass": "createReactClass",
+      "pragma": "React",
+      "version": "16.6.3",
+      "flowVersion": "0.53"
     },
-    "propWrapperFunctions": [ "forbidExtraProps" ] // The names of any functions used to wrap the
-                                                   // propTypes object, e.g. `forbidExtraProps`.
-                                                   // If this isn't set, any propTypes wrapped in
-                                                   // a function will be skipped.
+    "propWrapperFunctions": [
+      "forbidExtraProps"
+    ]
   }
 }

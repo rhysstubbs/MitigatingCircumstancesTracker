@@ -49,7 +49,9 @@
     "react-twitter-widgets": "^1.7.1",
     "reactstrap": "^6.5.0",
     "recompose": "^0.30.0",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "classnames": "^2.2.6",
+    "fg-loadcss": "^2.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.2.0",
