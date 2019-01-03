@@ -70,7 +70,7 @@ class AccountDrawer extends React.Component {
     handleSave = (event) => {
         event.preventDefault();
 
-        console.log("saving!");
+        alert("Coming Soon.")
     };
 
     handleChange = name => event => {
@@ -100,7 +100,6 @@ class AccountDrawer extends React.Component {
                         }}>
 
                     <div tabIndex={0}
-
                         role="button">
 
                         <AppBar position="fixed" className={classes.appBar}>

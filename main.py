@@ -142,17 +142,29 @@ def validate_token(token):
 
 
 def load_user_data(username, name=None, avatar=None):
-    url = API_URL + "/user/%s?withRequests=true" % username
+    url = API_URL + "/user/%s?withRequests=true&withNotifications=true" % username
 
     response = requests.get(url=url)
 
-    data_dict = {"user": {"username": username, "isAdmin": None, "name": name, "avatar": avatar}, "requests": None}
+    data_dict = {
+        "user": {
+            "username": username,
+            "isAdmin": None,
+            "name": name,
+            "avatar": avatar,
+            "notifications": []
+        },
+        "requests": []
+    }
 
     if response.status_code == OK:
         user_data = response.json()
 
         is_admin = user_data['isAdmin']
         data_dict["user"]["isAdmin"] = is_admin
+
+        if 'notifications' in user_data:
+            data_dict["user"]["notifications"] = user_data["notifications"]
 
         if is_admin:
 
@@ -165,7 +177,7 @@ def load_user_data(username, name=None, avatar=None):
 
         else:
 
-            if 'requests' in user_data:
+            if 'requests' in user_data and len(user_data["requests"]) > 0:
                 data_dict["requests"] = user_data["requests"]
 
     return data_dict

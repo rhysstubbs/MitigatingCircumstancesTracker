@@ -3,7 +3,7 @@
  */
 
 export const ADD_REQUEST = "SUBMIT_REQUEST";
-export const EDIT_REQUEST = "EDIT_REQUEST";
+export const UPDATE_REQUEST = "UPDATE_REQUEST";
 export const MARK_REQUEST_AS = "MARK_REQUEST_AS";
 
 export const ADDING_REQUEST = "ADDING_REQUEST";

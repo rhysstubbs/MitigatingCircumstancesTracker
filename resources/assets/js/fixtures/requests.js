@@ -49,8 +49,12 @@ export const requestColumns = [
                 color = "#f44168";
             }
 
+            if (row.original.status === "MoreInfoRequired") {
+                color = "#FF8333";
+            }
+
             return (
-                <p style={{color: color}} className={'m-0 p-0'}>{row.original.status}</p>
+                <p style={{color: color}} className={'m-0 p-0'}>{row.original.status.split(/(?=[A-Z])/).join(" ")}</p>
             )
         },
         filterMethod: (filter, row) => {

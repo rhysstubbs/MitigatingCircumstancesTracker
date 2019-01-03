@@ -26,8 +26,11 @@ class Routes extends React.Component {
             <Switch>
                 <Route exact path={"/dashboard"} component={Dashboard}/>
                 <Route exact path="/requests" component={RequestList}/>
-                <Route exact path="/submit" component={CaseSubmit}/>
-                <Route exact path={"/account"} component={MyAccount} />
+
+                <Route exact path={"/request/submit"} component={CaseSubmit}/>
+                <Route exact path={"/request/:id/edit"} component={CaseSubmit}/>
+
+                <Route exact path={"/account"} component={MyAccount}/>
             </Switch>
         )
     }

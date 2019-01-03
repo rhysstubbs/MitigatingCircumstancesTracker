@@ -21,6 +21,8 @@ import reasons from 'MCT/fixtures/mct-reasons';
 import {faFileUpload, faInfoCircle, faGraduationCap, faTimes} from '@fortawesome/free-solid-svg-icons';
 import {isObjectEmpty} from "MCT/utils/helpers";
 import PropTypes from 'prop-types';
+import EULA from 'MCT/fixtures/EULA';
+import moment from 'moment';
 
 library.add(faFileUpload, faInfoCircle, faGraduationCap, faTimes);
 library.add(faFileWord, faFilePdf, faFilePowerpoint, faFileAudio, faFileAlt, faFileImage);
@@ -53,7 +55,18 @@ const mapDispatchToProps = {
     postRequest
 };
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, ownProps) => {
+
+    const params = ownProps.match.params;
+
+    if (params.hasOwnProperty("id")) {
+
+        return {
+            user: state.user,
+            data: state.requests.find((request) => request.id === parseInt(params.id))
+        }
+    }
+
     return {
         user: state.user
     }
@@ -65,7 +78,7 @@ const styles = theme => ({
         flexWrap: 'wrap',
     },
     textField: {
-        width: 200,
+        width: '200px',
     },
     root: {
         width: '90%',
@@ -87,25 +100,54 @@ class SubmitRequestView extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = {
-            activeStep: 0,
-            declinedFiles: [],
-            formErrors: [],
-            fileUploadErrors: [],
-            loading: false,
-            showOther: false,
+        const {data} = props;
 
-            /** payload data */
-            description: "",
-            extension: false,
-            reason: {},
-            reasonOther: "",
-            agreementSigned: false,
-            dateStarted: "",
-            dateEnded: "",
-            onGoing: false,
-            files: []
-        };
+        if (props.hasOwnProperty("data")) {
+
+            this.state = {
+                activeStep: 0,
+                declinedFiles: [],
+                formErrors: [],
+                fileUploadErrors: [],
+                loading: false,
+                showOther: false,
+
+                /** payload data */
+                id: data.id,
+                description: data.description || "",
+                extension: data.extension || false,
+                reason: reasons.find((reason) => reason.value === data.reason) || null,
+                reasonOther: data.reason || "",
+                agreementSigned: data.agreementSigned || false,
+                dateStarted: moment(data.dateStarted).format("YYYY-MM-DD") || "",
+                dateEnded: moment(data.dateEnded).format("YYYY-MM-DD") || "",
+                onGoing: data.onGoing || false,
+                files: []
+            };
+
+        } else {
+
+            this.state = {
+                activeStep: 0,
+                declinedFiles: [],
+                formErrors: [],
+                fileUploadErrors: [],
+                loading: false,
+                showOther: false,
+
+                /** payload data */
+                id: null,
+                description: "",
+                extension: false,
+                reason: "",
+                reasonOther: "",
+                agreementSigned: false,
+                dateStarted: "",
+                dateEnded: "",
+                onGoing: false,
+                files: []
+            };
+        }
     }
 
     static getIconForFileType(fileName) {
@@ -129,17 +171,21 @@ class SubmitRequestView extends React.Component {
         return fn.pop().toLowerCase();
     }
 
+    isExisting = () => {
+        return this.state.id !== null;
+    };
+
     submit = () => {
 
         this.setState({
             loading: true
         });
 
-        const request = {
+        let request = {
             owner: this.props.user.username,
             extension: this.state.extension,
             description: this.state.description,
-            reason: isObjectEmpty(this.state.reason) ?  this.state.reasonOther : this.state.reason.value,
+            reason: isObjectEmpty(this.state.reason) ? this.state.reasonOther : this.state.reason.value,
             agreementSigned: this.state.agreementSigned,
             dateStarted: this.state.dateStarted,
             dateEnded: this.state.dateEnded,
@@ -147,8 +193,12 @@ class SubmitRequestView extends React.Component {
             files: this.state.files
         };
 
+        if (this.isExisting()) {
+            request.id = this.state.id;
+        }
+
         this.props.postRequest(request)
-         .then(response => {
+            .then(response => {
 
                 this.setState({
                     loading: false
@@ -156,7 +206,7 @@ class SubmitRequestView extends React.Component {
 
                 return response;
             })
-         .then(() => {
+            .then(() => {
                 this.props.history.push('/requests');
             });
     };
@@ -274,6 +324,7 @@ class SubmitRequestView extends React.Component {
                             <FormControlLabel
                                 control={
                                     <Checkbox
+                                        disabled={this.isExisting()}
                                         checked={this.state.extension}
                                         onChange={this.handleCheckChange('extension')}
                                         value='extension'
@@ -291,7 +342,6 @@ class SubmitRequestView extends React.Component {
                                    onChange={this.handleChange}
                                    value={this.state.description}
                                    placeholder="Description"
-                                   invalid={this.state.description === ""}
                             />
                         </FormGroup>
 
@@ -340,10 +390,11 @@ class SubmitRequestView extends React.Component {
                             <TextField
                                 id="date"
                                 label="Date started"
+                                value={this.state.dateStarted}
                                 type="date"
                                 required={true}
+                                disabled={this.isExisting()}
                                 className={styles.textField}
-                                fullWidth={false}
                                 InputLabelProps={{
                                     shrink: true,
                                 }}
@@ -359,6 +410,7 @@ class SubmitRequestView extends React.Component {
                             <FormControlLabel
                                 control={
                                     <Checkbox
+                                        disabled={this.isExisting()}
                                         checked={this.state.onGoing}
                                         onChange={this.handleCheckChange('onGoing')}
                                         value='onGoing'
@@ -373,9 +425,10 @@ class SubmitRequestView extends React.Component {
                                     id="date"
                                     label="Date end"
                                     type="date"
+                                    value={this.state.dateEnded}
+                                    disabled={this.isExisting()}
                                     required={true}
                                     className={styles.textField}
-                                    fullWidth={false}
                                     InputLabelProps={{
                                         shrink: true,
                                     }}
@@ -536,29 +589,7 @@ class SubmitRequestView extends React.Component {
             <React.Fragment>
                 <Typography gutterBottom={true} variant={"h6"}>{"Request for Extension or Postponement"}</Typography>
 
-                <small>
-                    Please use this form if you are reporting circumstances prior to the hand-in date or examination
-                    date.
-
-                    If you have a short term sickness (up to 5 calendar days) before the hand-in date or examination
-                    date please ensure you contact your programme team to notify them of short-term sickness. You must
-                    contact them at least one hour before the submission time/ examination start time. You will then be
-                    provided with the completed Self-certification form to submit as evidence.
-
-                    If you are reporting Circumstances after the hand-in date or examination date please refer to the
-                    ‘Assessment Board Consideration’ request form.
-
-                    Please refer to 6J- Exceptional Circumstances including Extensions: Policy and Procedures when
-                    completing this form.
-
-                    If this document is not in an accessible format to you, please email
-                    academicquality@bournemouth.ac.uk or contact askBU and we will endeavour to supply the information
-                    in a more suitable format.
-
-                    Confidentiality: We appreciate that your circumstances may be of a personal or sensitive nature. The
-                    information provided in this form and all evidence submitted in support will be handled in
-                    accordance with the relevant BU Data Protection Policy.
-                </small>
+                <EULA/>
 
                 <Stepper activeStep={activeStep} orientation="vertical">
                     {steps.map((label, index) => {
@@ -596,11 +627,18 @@ class SubmitRequestView extends React.Component {
     }
 }
 
+SubmitRequestView.defualtProps = {
+    data: {},
+    reason: {}
+};
+
 SubmitRequestView.propTypes = {
     history: PropTypes.object.isRequired,
     postRequest: PropTypes.func.isRequired,
     classes: PropTypes.object,
-    user: PropTypes.object
+    user: PropTypes.object,
+    match: PropTypes.object,
+    data: PropTypes.object
 };
 
 export default compose(

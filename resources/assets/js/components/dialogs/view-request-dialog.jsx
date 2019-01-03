@@ -15,9 +15,7 @@ import CardContent from '@material-ui/core/CardContent';
 import List from '@material-ui/core/List';
 import Avatar from '@material-ui/core/Avatar';
 import ListItem from '@material-ui/core/ListItem';
-import TextField from '@material-ui/core/TextField';
-import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
-import {withRouter} from 'react-router-dom';
+import {Link, withRouter} from 'react-router-dom';
 import {compose} from "recompose";
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
@@ -30,23 +28,24 @@ import DownloadIcon from '@material-ui/icons/CloudDownload';
 import FileIcon from '@material-ui/icons/FileCopy';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faTimes, faFile} from '@fortawesome/free-solid-svg-icons';
-import {markRequestAs} from "MCT/store/action-creators/requests";
 import Loader from 'MCT/components/core/loader';
-
+import RequestMoreInfoDrawer from "MCT/components/drawers/request-more-info-drawer";
+import DenyRequestDrawer from "MCT/components/drawers/deny-request-drawer";
 import {REQUEST_APPROVED, REQUEST_ARCHIVED} from 'MCT/constants/request-status';
-import {toast} from 'react-toastify';
+import {connect} from 'react-redux';
+import {toast} from "react-toastify";
+import {markRequestAs} from "MCT/store/action-creators/requests";
 
 library.add(faTimes, faFile);
-import {connect} from 'react-redux';
-
-const mapDispatchToProps = {
-    markRequestAs,
-};
 
 const mapStateToProps = state => {
     return {
         user: state.user
     }
+};
+
+const mapDispatchToProps = {
+    markRequestAs
 };
 
 function Transition(props) {
@@ -175,62 +174,15 @@ class ViewRequestDialog extends React.Component {
         this.state = {
             loading: false,
             reasonToDeny: "",
+            reasonForInfo: "",
             draws: {
                 denyDrawIsOpen: false,
+                infoDrawIsOpen: false
             }
         };
 
         this.initialState = this.state;
     }
-
-    toggleDrawer = (side, open) => () => {
-
-        if (side === '*' && open === false) {
-
-            Object.keys(this.state.draws).forEach((key) => {
-                this.setState({
-                    [key]: open
-                });
-            })
-        }
-
-        this.setState({
-            draws: {
-                [side]: open
-            },
-        });
-    };
-
-    markAsDenied = () => {
-
-        this.setState({
-            loading: true
-        });
-
-        const payload = {
-            requestId: this.props.data.id,
-            status: REQUEST_ARCHIVED,
-            reason: this.state.reasonToDeny
-        };
-
-        this.props.markRequestAs(payload)
-            .then((response) => {
-                toast.success(
-                    `Request ${this.props.data.id} was saved.`,
-                    {
-                        position: toast.POSITION.TOP_RIGHT
-                    }
-                );
-                return response;
-            })
-            .then((response) => {
-
-                this.setState(this.initialState);
-
-                return response;
-            })
-            .then(() => this.close());
-    };
 
     markAs = (status) => {
         this.setState({
@@ -260,6 +212,28 @@ class ViewRequestDialog extends React.Component {
             })
             .then(() => this.close());
 
+    };
+
+    toggleDrawer = (side, open) => () => {
+
+        if (side === '*' && open === false) {
+
+            Object.keys(this.state.draws).forEach((key) => {
+                this.setState({
+                    [key]: open
+                });
+            })
+        }
+
+        this.setState({
+            draws: {
+                [side]: open
+            },
+        });
+    };
+
+    requestMoreInfo = () => {
+        console.log(this.state);
     };
 
     getEvidenceFiles = () => {
@@ -305,6 +279,22 @@ class ViewRequestDialog extends React.Component {
     };
 
     getStudentActions = () => {
+
+        const {id} = this.props.data;
+
+        if (this.props.data.status === "MoreInfoRequired") {
+
+            return (
+                <React.Fragment>
+                    <Button variant={'contained'}
+                            color="primary">
+                        <Link style={{color: "#fff"}} to={{pathname: `/request/${id}/edit`}}>Edit/Update</Link>
+                    </Button>
+                </React.Fragment>
+            )
+        }
+
+
         return (
             <React.Fragment>
 
@@ -332,6 +322,13 @@ class ViewRequestDialog extends React.Component {
                         className={'mr-3'}>Deny</Button>
             );
 
+            actions.push(
+                <Button onClick={this.toggleDrawer('infoDrawIsOpen', true)}
+                        variant={"contained"}
+                        color="default"
+                        className={'mr-3'}>Request More Info</Button>
+            );
+
 
         } else if (status !== 'Submitted' && status !== 'Archived') {
             actions.push(
@@ -349,12 +346,6 @@ class ViewRequestDialog extends React.Component {
             </React.Fragment>
         )
 
-    };
-
-    handleChange = name => event => {
-        this.setState({
-            [name]: event.target.value,
-        });
     };
 
     close = () => {
@@ -377,7 +368,7 @@ class ViewRequestDialog extends React.Component {
                             <Toolbar>
                                 <div style={{display: 'flex', flexGrow: 1}}>
                                     <Typography variant="title" color="inherit" noWrap className={'mr-5'}>
-                                        {`Request`}
+                                        {`Request - ${this.props.data.id}`}
                                     </Typography>
                                 </div>
 
@@ -399,11 +390,12 @@ class ViewRequestDialog extends React.Component {
                                     </Typography>
 
                                     <Typography color="textPrimary" gutterBottom>
-                                        Student: <span className={'text-secondary'}>{this.props.data.owner.path[0].name}</span>
+                                        Student: <span
+                                        className={'text-secondary'}>{this.props.data.owner.path[0].name}</span>
                                     </Typography>
 
                                     <Typography color="textPrimary" gutterBottom>
-                                        Status: <span className={'text-secondary'}>{this.props.data.status}</span>
+                                        Status: <span className={'text-secondary'}>{this.props.data.status.split(/(?=[A-Z])/).join(" ")}</span>
                                     </Typography>
 
                                     <Typography color="textPrimary" gutterBottom>
@@ -419,12 +411,15 @@ class ViewRequestDialog extends React.Component {
                                     </Typography>
 
                                     {this.props.data.onGoing ?
-                                        <Typography gutterBottom>Date the issue stopped: <span className={'text-secondary'}>This is an on-going problem.</span></Typography> :
-                                        <Typography gutterBottom>Date the issue stopped: <span className={'text-secondary'}><Moment
+                                        <Typography gutterBottom>Date the issue stopped: <span
+                                            className={'text-secondary'}>This is an on-going problem.</span></Typography> :
+                                        <Typography gutterBottom>Date the issue stopped: <span
+                                            className={'text-secondary'}><Moment
                                             format="DD/MM/YYYY">{this.props.data.dateEnded}</Moment></span></Typography>
                                     }
 
-                                    <Typography gutterBottom>Generel Reason: <span className={"text-secondary"}>{this.props.data.reason}</span></Typography>
+                                    <Typography gutterBottom>Generel Reason: <span
+                                        className={"text-secondary"}>{this.props.data.reason}</span></Typography>
 
                                     <hr/>
 
@@ -454,52 +449,17 @@ class ViewRequestDialog extends React.Component {
                                 </CardActions>
 
 
-                                <SwipeableDrawer
-                                    anchor="bottom"
-                                    open={this.state.draws.denyDrawIsOpen}
-                                    onClose={this.toggleDrawer('denyDrawIsOpen', false)}
-                                    onOpen={this.toggleDrawer('denyDrawIsOpen', true)}>
+                                <RequestMoreInfoDrawer open={this.state.draws.infoDrawIsOpen}
+                                                       onClose={this.toggleDrawer('infoDrawIsOpen', false)}
+                                                       onOpen={this.toggleDrawer('infoDrawIsOpen', true)}
+                                                       onClick={this.requestMoreInfo}
+                                                       data={this.props.data}/>
 
-                                    <div
-                                        tabIndex={0}
-                                        role="button"
-                                        onClick={this.toggleDrawer('denyDrawIsOpen', false)}
-                                        onKeyDown={this.toggleDrawer('denyDrawIsOpen', false)}>
-                                    </div>
+                                <DenyRequestDrawer open={this.state.draws.denyDrawIsOpen}
+                                                   onClose={this.toggleDrawer('denyDrawIsOpen', false)}
+                                                   onOpen={this.toggleDrawer('denyDrawIsOpen', true)}
+                                                   data={this.props.data}/>
 
-                                    <div className={'pt-5 pb-5 pl-2 pr-2'}>
-
-                                        <Typography variant={"headline"} color="primary" gutterBottom>Mark As
-                                            Denied</Typography>
-
-                                        <TextField
-                                            id="outlined-full-width"
-                                            label="Reason to Deny"
-                                            required
-                                            style={{marginBottom: 20}}
-                                            placeholder="E.g. The student no longer requires an extension."
-                                            helperText="Pleas ensure you are clear and concise as this will be sent to the student as well as other staff."
-                                            fullWidth
-                                            multiline
-                                            rowsMax="4"
-                                            value={this.state.reasonToDeny}
-                                            onChange={this.handleChange('reasonToDeny')}
-                                            margin="normal"
-                                            variant="outlined"
-                                            InputLabelProps={{
-                                                shrink: true,
-                                            }}
-                                        />
-
-                                        <Button
-                                            onClick={this.markAsDenied}
-                                            variant={"outlined"}
-                                            disabled={this.state.reasonToDeny.length <= 0}
-                                            color="primary">Submit</Button>
-
-                                    </div>
-
-                                </SwipeableDrawer>
 
                             </Card>
                         </Paper>

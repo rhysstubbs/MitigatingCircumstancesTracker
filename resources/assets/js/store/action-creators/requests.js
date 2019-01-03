@@ -1,6 +1,6 @@
 import {OK} from 'http-status-codes';
 import axios from 'axios';
-import {addRequest, addRequestError, markRequest} from 'MCT/store/actions/index';
+import {addRequest, addRequestError, markRequest, updateRequest} from 'MCT/store/actions/index';
 
 import {API_URL} from "MCT/utils/api";
 
@@ -48,7 +48,23 @@ const postRequest = (payload) => {
 
         const {files, ...jsonPayload} = payload;
 
-        return axios.post(`${API_URL}/request`, jsonPayload)
+        let options = {};
+
+        if (payload.hasOwnProperty("id")) {
+            options = {
+                method: 'patch',
+                path: `${API_URL}/request/${payload.id}`,
+                existing: true
+            }
+        } else {
+            options = {
+                method: 'post',
+                path: `${API_URL}/request`,
+                existing: false
+            }
+        }
+
+        return axios[options.method](options.path, jsonPayload)
             .then(response => {
 
                 switch (response.status) {
@@ -87,7 +103,12 @@ const postRequest = (payload) => {
 
             })
             .then(request => {
-                dispatch(addRequest(request));
+
+                if (options.existing) {
+                    dispatch(updateRequest(request))
+                } else {
+                    dispatch(addRequest(request));
+                }
             })
             .catch(error => {
                 dispatch(addRequestError(error));

@@ -56,7 +56,7 @@ class Header extends React.Component {
                     <Link to={'/requests'} className='nav-link'>Your Requests</Link>
                 </li>
                 <li className="nav-item">
-                    <Link to={'/submit'} className='nav-link'>Submit new Request</Link>
+                    <Link to={'/request/submit'} className='nav-link'>Submit new Request</Link>
                 </li>
             </ul>
         )

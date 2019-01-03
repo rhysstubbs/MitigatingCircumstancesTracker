@@ -1,20 +1,22 @@
 import {
     ADD_REQUEST,
-    ADDING_REQUEST,
     ADDING_REQUEST_ERROR,
-    MARK_REQUEST_AS
+    MARK_REQUEST_AS,
+    UPDATE_REQUEST
 } from "MCT/store/action-types/requests";
 
-const addingRequest = status => (
-    {
-        type: ADDING_REQUEST,
-        payload: status
-    }
-);
+import {DELETE_NOTIFICATION} from 'MCT/store/action-types/user';
 
 const addRequest = request => (
     {
         type: ADD_REQUEST,
+        payload: request
+    }
+);
+
+const updateRequest = request => (
+    {
+        type: UPDATE_REQUEST,
         payload: request
     }
 );
@@ -33,9 +35,17 @@ const addRequestError = error => (
     }
 );
 
+const removeNotification = payload => (
+    {
+        type: DELETE_NOTIFICATION,
+        payload: payload
+    }
+);
+
 export {
     addRequest,
-    addingRequest,
+    removeNotification,
     markRequest,
+    updateRequest,
     addRequestError
 }
