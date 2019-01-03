@@ -13,6 +13,11 @@ const requests = (state = [], action) => {
                     if (request.id === action.payload.requestId) {
                         request = action.payload;
 
+                        console.log("REQUEST FOUND");
+
+                        console.log("current", action.payload);
+                        console.log("updated", request);
+
                         return request;
                     }
 

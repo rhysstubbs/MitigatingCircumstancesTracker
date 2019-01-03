@@ -5,8 +5,6 @@ import React from "react";
 import requestStatus from 'MCT/constants/request-status';
 import OpenIcon from '@material-ui/icons/OpenInBrowser';
 import TextField from "@material-ui/core/TextField";
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
 import moment from 'moment';
 
 export const requestColumns = [
@@ -49,12 +47,20 @@ export const requestColumns = [
                 color = "#f44168";
             }
 
+            if (row.original.status === "Denied") {
+                color = "#f43028";
+            }
+
+            if (row.original.status === "Updated") {
+                color = "#801cd8";
+            }
+
             if (row.original.status === "MoreInfoRequired") {
                 color = "#FF8333";
             }
 
             return (
-                <p style={{color: color}} className={'m-0 p-0'}>{row.original.status.split(/(?=[A-Z])/).join(" ")}</p>
+                <p style={{color: color}} className={'m-0 p-0'}>{row.original.status.toPascalCase().splitByCaps()}</p>
             )
         },
         filterMethod: (filter, row) => {
@@ -80,7 +86,7 @@ export const requestColumns = [
 
                     {requestStatus.map(status => {
                         return (
-                            <option value={status} key={status}>{status.toPascalCase()}</option>
+                            <option value={status} key={status}>{status.toPascalCase().splitByCaps()}</option>
                         );
                     })}
                 </select>
@@ -124,7 +130,11 @@ export const requestColumns = [
     },
     {
         Header: 'Description',
-        accessor: 'description'
+        accessor: 'description',
+        type: 'custom',
+        Cell: (row) => {
+            return row.original.description.substr(0, 35).concat('...');
+        }
     },
     {
         Header: '',
@@ -133,8 +143,7 @@ export const requestColumns = [
         isAdmin: true,
         headerClassName: 'action',
         sortable: false,
-        Filter: () => {
-        },
+        Filter: () => {},
         Cell: (row) => {
             return (
                 <DialogLauncher className={"btn-mini outlined-primary"}

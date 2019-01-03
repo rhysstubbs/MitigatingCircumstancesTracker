@@ -4,11 +4,12 @@ import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
-import {REQUEST_ARCHIVED} from "MCT/constants/request-status";
+import {REQUEST_DENIED} from "MCT/constants/request-status";
 import {toast} from "react-toastify";
 import {markRequestAs} from "MCT/store/action-creators/requests";
 import connect from "react-redux/es/connect/connect";
 import {compose} from "recompose";
+import Loader from "MCT/components/core/loader";
 
 const mapDispatchToProps = {
     markRequestAs
@@ -20,8 +21,11 @@ class DenyRequestDrawer extends React.Component {
         super(props);
 
         this.state = {
+            loading: false,
             reasonToDeny: "",
         };
+
+        this.initialState = this.state;
     }
 
     handleChange = name => event => {
@@ -38,7 +42,7 @@ class DenyRequestDrawer extends React.Component {
 
         const payload = {
             requestId: this.props.data.id,
-            status: REQUEST_ARCHIVED,
+            status: REQUEST_DENIED,
             reason: this.state.reasonToDeny
         };
 
@@ -58,7 +62,10 @@ class DenyRequestDrawer extends React.Component {
 
                 return response;
             })
-            .then(() => this.close());
+            .then(() => {
+                this.setState({loading: false});
+                this.props.onClose();
+            });
     };
 
     render() {
@@ -108,6 +115,8 @@ class DenyRequestDrawer extends React.Component {
 
                     </div>
 
+                    <Loader isLoading={this.state.loading} fullScreen={true}/>
+
                 </SwipeableDrawer>
             </React.Fragment>
         );
@@ -124,9 +133,9 @@ DenyRequestDrawer.propTypes = {
     open: PropTypes.bool,
     onClose: PropTypes.func,
     onOpen: PropTypes.func,
-    onClick: PropTypes.func,
     data: PropTypes.object,
     markRequestAs: PropTypes.func
+
 };
 
 export default compose(connect(null, mapDispatchToProps))(DenyRequestDrawer);

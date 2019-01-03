@@ -94,7 +94,7 @@ class Dashboard extends React.Component {
                     back!</Typography>
 
                 <Row>
-                    <Col sm={6} md={12} lg={12}>
+                    <Col xs={6} sm={12} md={12} lg={12}>
                         <Card className={classes.card}>
                             <CardContent>
                                 <Typography variant={"h5"} color={"primary"} gutterBottom={true} style={{position: "relative"}}>BU News</Typography>
@@ -112,7 +112,7 @@ class Dashboard extends React.Component {
                         </Card>
                     </Col>
 
-                    <Col sm={6} md={12} lg={12}>
+                    <Col xs={6} sm={12} md={12} lg={12}>
                         <Card className={classes.card}>
                             <CardContent>
                                 <Typography variant={"h5"} color={"primary"} gutterBottom={true}

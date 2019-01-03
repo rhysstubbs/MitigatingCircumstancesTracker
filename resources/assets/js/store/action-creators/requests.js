@@ -1,7 +1,7 @@
 import {OK} from 'http-status-codes';
 import axios from 'axios';
 import {addRequest, addRequestError, markRequest, updateRequest} from 'MCT/store/actions/index';
-
+import {REQUEST_MORE_INFO} from "MCT/constants/request-status";
 import {API_URL} from "MCT/utils/api";
 
 const postFiles = (requestId, files) => {
@@ -133,7 +133,22 @@ const markRequestAs = (payload) => {
     }
 };
 
+const requestMoreInfo = (payload) => {
+    return function (dispatch) {
+        return axios.post(`${API_URL}/request/${payload.requestId}/moreInfo`, payload.data)
+            .then((response) => {
+                switch (response.status) {
+                    case OK:
+                        dispatch(markRequest({status: REQUEST_MORE_INFO, requestId: payload.requestId}));
+                        return response;
+                }
+            })
+    }
+};
+
 export {
     postRequest,
-    markRequestAs
+    markRequestAs,
+    requestMoreInfo,
+    postFiles
 };

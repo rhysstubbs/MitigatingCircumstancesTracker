@@ -4,6 +4,15 @@ import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
+import {toast} from "react-toastify";
+import {requestMoreInfo} from "MCT/store/action-creators/requests";
+import {compose} from "recompose";
+import connect from "react-redux/es/connect/connect";
+import Loader from "MCT/components/core/loader";
+
+const mapDispatchToProps = {
+    requestMoreInfo
+};
 
 class RequestMoreInfoDrawer extends React.Component {
 
@@ -11,9 +20,46 @@ class RequestMoreInfoDrawer extends React.Component {
         super(props);
 
         this.state = {
-            reasonForInfo: "",
+            loading: false,
+            reasonForInfo: ""
         };
+
+        this.initialState = this.state;
     }
+
+    markAsMoreInfo = () => {
+
+        this.setState({
+            loading: true
+        });
+
+        const payload = {
+            requestId: this.props.data.id,
+            data: {
+                description: this.state.reasonForInfo,
+
+            }
+        };
+
+        this.props.requestMoreInfo(payload)
+            .then((response) => {
+                toast.success(
+                    `Request ${this.props.data.id} was updated.`,
+                    {
+                        position: toast.POSITION.TOP_RIGHT
+                    }
+                );
+                return response;
+            })
+            .then((response) => {
+                this.setState(this.initialState);
+                return response;
+            })
+            .then(() => {
+                this.setState({loading: false});
+                this.props.onClose();
+            });
+    };
 
     handleChange = name => event => {
         this.setState({
@@ -33,8 +79,8 @@ class RequestMoreInfoDrawer extends React.Component {
                     <div
                         tabIndex={0}
                         role="button"
-                        onClick={this.props.onClick}
-                        onKeyDown={this.props.onClick}>
+                        onClick={this.props.onClose}
+                        onKeyDown={this.props.onClose}>
                     </div>
 
                     <div className={'pt-5 pb-5 pl-2 pr-2'}>
@@ -62,12 +108,14 @@ class RequestMoreInfoDrawer extends React.Component {
                         />
 
                         <Button
-                            onClick={this.props.onClick}
+                            onClick={this.markAsMoreInfo}
                             variant={"outlined"}
                             disabled={this.state.reasonForInfo.length <= 0}
                             color="primary">Send</Button>
 
                     </div>
+
+                    <Loader isLoading={this.state.loading} fullScreen={true}/>
 
                 </SwipeableDrawer>
             </React.Fragment>
@@ -75,16 +123,17 @@ class RequestMoreInfoDrawer extends React.Component {
     }
 }
 
-
 RequestMoreInfoDrawer.defaultProps = {
-    open: false
+    open: false,
+    data: {}
 };
 
 RequestMoreInfoDrawer.propTypes = {
     open: PropTypes.bool,
     onClose: PropTypes.func,
     onOpen: PropTypes.func,
-    onClick: PropTypes.func
+    data: PropTypes.object,
+    requestMoreInfo: PropTypes.func
 };
 
-export default RequestMoreInfoDrawer;
+export default compose(connect(null, mapDispatchToProps))(RequestMoreInfoDrawer);

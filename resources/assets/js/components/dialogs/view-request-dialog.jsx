@@ -232,10 +232,6 @@ class ViewRequestDialog extends React.Component {
         });
     };
 
-    requestMoreInfo = () => {
-        console.log(this.state);
-    };
-
     getEvidenceFiles = () => {
 
         const files = this.props.data.files;
@@ -286,18 +282,26 @@ class ViewRequestDialog extends React.Component {
 
             return (
                 <React.Fragment>
-                    <Button variant={'contained'}
+                    <Button variant={'contained'} className={'mr-3'}
                             color="primary">
                         <Link style={{color: "#fff"}} to={{pathname: `/request/${id}/edit`}}>Edit/Update</Link>
                     </Button>
+                    <Button
+                        onClick={this.markAs.bind(null, REQUEST_ARCHIVED)}
+                        variant={'contained'}
+                        color="default"
+                        className={'mr-3'}>Cancel</Button>
                 </React.Fragment>
             )
         }
 
-
         return (
             <React.Fragment>
-
+                <Button
+                    onClick={this.markAs.bind(null, REQUEST_ARCHIVED)}
+                    variant={'contained'}
+                    color="default"
+                    className={'mr-3'}>Cancel</Button>
             </React.Fragment>
         )
     };
@@ -306,7 +310,7 @@ class ViewRequestDialog extends React.Component {
         const status = this.props.data.status;
         let actions = [];
 
-        if (status === 'Submitted') {
+        if (status !== 'Approved') {
 
             actions.push(
                 <Button onClick={this.markAs.bind(null, REQUEST_APPROVED)}
@@ -314,28 +318,32 @@ class ViewRequestDialog extends React.Component {
                         color="secondary"
                         className={'mr-3'}>Approve</Button>
             );
+        }
 
+        if (status !== 'Denied') {
             actions.push(
                 <Button onClick={this.toggleDrawer('denyDrawIsOpen', true)}
                         variant={"contained"}
                         color="primary"
                         className={'mr-3'}>Deny</Button>
             );
+        }
 
+        if (status !== 'moreInfoRequired') {
             actions.push(
                 <Button onClick={this.toggleDrawer('infoDrawIsOpen', true)}
                         variant={"contained"}
                         color="default"
                         className={'mr-3'}>Request More Info</Button>
             );
+        }
 
-
-        } else if (status !== 'Submitted' && status !== 'Archived') {
+        if( status !== 'Archived') {
             actions.push(
                 <Button
                     onClick={this.markAs.bind(null, REQUEST_ARCHIVED)}
                     variant={'contained'}
-                    color="secondary"
+                    color="default"
                     className={'mr-3'}>Archive</Button>
             );
         }
@@ -395,7 +403,8 @@ class ViewRequestDialog extends React.Component {
                                     </Typography>
 
                                     <Typography color="textPrimary" gutterBottom>
-                                        Status: <span className={'text-secondary'}>{this.props.data.status.split(/(?=[A-Z])/).join(" ")}</span>
+                                        Status: <span
+                                        className={'text-secondary'}>{this.props.data.status.split(/(?=[A-Z])/).join(" ")}</span>
                                     </Typography>
 
                                     <Typography color="textPrimary" gutterBottom>
@@ -439,7 +448,6 @@ class ViewRequestDialog extends React.Component {
                                         </Typography>
 
                                         {this.getEvidenceFiles()}
-
                                     </div>
 
                                 </CardContent>
@@ -449,17 +457,15 @@ class ViewRequestDialog extends React.Component {
                                 </CardActions>
 
 
-                                <RequestMoreInfoDrawer open={this.state.draws.infoDrawIsOpen}
-                                                       onClose={this.toggleDrawer('infoDrawIsOpen', false)}
-                                                       onOpen={this.toggleDrawer('infoDrawIsOpen', true)}
-                                                       onClick={this.requestMoreInfo}
-                                                       data={this.props.data}/>
+                                {this.props.user.isAdmin ? <RequestMoreInfoDrawer open={this.state.draws.infoDrawIsOpen}
+                                                                                  onClose={this.toggleDrawer('infoDrawIsOpen', false)}
+                                                                                  onOpen={this.toggleDrawer('infoDrawIsOpen', true)}
+                                                                                  data={this.props.data}/> : null}
 
-                                <DenyRequestDrawer open={this.state.draws.denyDrawIsOpen}
-                                                   onClose={this.toggleDrawer('denyDrawIsOpen', false)}
-                                                   onOpen={this.toggleDrawer('denyDrawIsOpen', true)}
-                                                   data={this.props.data}/>
-
+                                {this.props.user.isAdmin ? <DenyRequestDrawer open={this.state.draws.denyDrawIsOpen}
+                                                                              onClose={this.toggleDrawer('denyDrawIsOpen', false)}
+                                                                              onOpen={this.toggleDrawer('denyDrawIsOpen', true)}
+                                                                              data={this.props.data}/> : null}
 
                             </Card>
                         </Paper>

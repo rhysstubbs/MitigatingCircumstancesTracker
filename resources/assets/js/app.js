@@ -2,10 +2,16 @@ import ApplicationContainer from './containers/application';
 
 const appContainer = 'app';
 
+/**
+ * APPLICATION ENTRY POINT
+ */
+
 // Mount the application
 if (document.getElementById(appContainer) != null) {
     ApplicationContainer.mount(appContainer);
 
+
+    // Uncomment to find elements wider than viewport
     /**var docWidth = document.documentElement.offsetWidth;
 
     [].forEach.call(
@@ -18,6 +24,9 @@ if (document.getElementById(appContainer) != null) {
     );*/
 }
 
+/**
+ * CUSTOM PROTOTYPE FUNCTIONS & HELPERS
+ */
 
 String.prototype.toPascalCase = function () {
 
@@ -34,4 +43,8 @@ String.prototype.toPascalCase = function () {
         return this.reduce((str) => (pascalise(str) + ""));
     }
 
+};
+
+String.prototype.splitByCaps = function () {
+    return this.split(/(?=[A-Z])/).join(" ");
 };
