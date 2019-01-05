@@ -4,13 +4,19 @@ const users = (state = [], action) => {
     if (action.type) {
         switch (action.type) {
 
-            case DELETE_NOTIFICATION:
-                return state.notifications.filter(notification => {
-                    return notification.id !== action.payload.id
-                });
+            case DELETE_NOTIFICATION: {
+                return {
+                    ...state,
+                    notifications: [
+                        ...state.notifications.filter(notification => notification.id !== action.payload)
+                    ]
+                };
+            }
 
-            default:
+            default: {
                 return state;
+            }
+
         }
     } else {
         return state;
