@@ -44,12 +44,27 @@ def base():
 
 @app.route('/dashboard', methods=['GET'])
 def dashboard():
+
+    session_data = json.loads(json.dumps(session['user']))
+
+    username = session_data.get("user", "").get("username", "")
+    name = session_data.get("user", "").get("name", "")
+    avatar = session_data.get("user", "").get("avatar", "")
+
+    new_data = load_user_data(username, name, avatar)
+
+    if new_data:
+
+        return render_template('dashboard.html', user_data=json.dumps(new_data))
+
     return render_template('dashboard.html', user_data=json.dumps(session["user"]))
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+
     if request.method == 'GET':
+
         return render_template('login.html')
 
     elif request.method == 'POST':
