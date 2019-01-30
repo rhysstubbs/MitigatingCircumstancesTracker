@@ -80,7 +80,7 @@ export const requestColumns = [
                 <select
                     onChange={event => onChange(event.target.value)}
                     style={{width: "100%", height: "32px"}}
-                    value={filter ? filter.value : "submitted"}>
+                    value={filter ? filter.value : "all"}>
 
                     <option value={"all"}>Show All</option>
 
