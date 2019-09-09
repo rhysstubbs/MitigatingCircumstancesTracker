@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+        <meta charset="UTF-8">
+        <title>{% block title %}{% endblock %}</title>
+    {% endblock %}
+
+    <meta name="google-signin-client_id"
+          content="228751891873-1jh8c268uvjjlj5ka45eb4cc9jkv7k7c.apps.googleusercontent.com">
+
+    <link type="text/css" rel="stylesheet" href="/public/assets/css/js/vendor.css"/>
+    <link type="text/css" rel="stylesheet" href="/public/assets/css/app.css"/>
+
+    {% block headerScripts %} {% endblock %}
+</head>
+<body>
+
+{% include 'header.html' ignore missing %}
+
+{% block body %}
+
+{% endblock %}
+
+{% include 'footer.html' ignore missing %}
+
+<script>
+    window.signOut = function signOut() {
+
+        let auth2 = gapi.auth2.getAuthInstance();
+
+        auth2.signOut().then(function () {
+            fetch(window.location.origin + '/logout').then(() => window.location.href = window.location.origin);
+        });
+    };
+
+    function onSuccess(googleUser) {
+
+        const name = googleUser.getBasicProfile().getName();
+
+        const loginForm = document.getElementById('login-form');
+        if (loginForm !== null || typeof loginForm !== 'undefined') {
+
+            const googleButton = document.getElementById("google-signin");
+            googleButton.classList.add("d-none");
+
+            document.getElementById("idToken").value = googleUser.getAuthResponse().id_token;
+            document.getElementById("logged-in-extras").classList.remove("d-none");
+            document.getElementById("continue-name").textContent = name.split(" ")[0];
+            document.getElementById("login-logout").addEventListener('click', signOut, false);
+        }
+    }
+
+    function onFailure(error) {
+        console.log("Error", error);
+    }
+
+    function onLoad() {
+
+        gapi.load('auth2', function () {
+            gapi.auth2.init();
+        });
+
+        let gbutton = document.getElementById("google-signin");
+
+        if (gbutton !== null) {
+
+            gapi.signin2.render('google-signin', {
+                'scope': 'profile email',
+                'height': 50,
+                'width': "382",
+                'longtitle': true,
+                'theme': 'dark',
+                'onsuccess': onSuccess,
+                'onfailure': onFailure
+            });
+        }
+    }
+</script>
+
+<script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
+
+{% block footerScripts %} {% endblock %}
+
+</body>
+</html>

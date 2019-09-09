@@ -1,0 +1,25 @@
+// ------------------------------------------------------------------------------------------------------
+// BUTTON STYLING
+
+.btn {
+
+  &:focus-within,
+  &:focus,
+  &:active {
+    box-shadow: none !important;
+  }
+
+  &.red {
+    color: #dc3545 !important;
+    background-color: #fff !important;
+  }
+
+}
+
+button {
+  &:focus-within,
+  &:focus,
+  &:active {
+    box-shadow: none !important;
+  }
+}
